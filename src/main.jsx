@@ -15,7 +15,6 @@ import {
   ShieldCheck
 } from "lucide-react";
 import paincubeLogo from "./assets/paincube-logo.png";
-import stellarCubeLogo from "./assets/stellar-cube-usa.png";
 import "./styles.css";
 
 const PHASES = {
@@ -159,7 +158,7 @@ function App() {
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
-      <div className="mx-auto flex min-h-screen max-w-[1760px] flex-col gap-4 px-4 py-4 sm:px-6">
+      <div className="mx-auto flex min-h-screen max-w-[1760px] flex-col gap-4 px-3 py-3 sm:px-6 sm:py-4">
         <Header onStart={startDemo} onReset={resetDemo} demoRunning={demoRunning} />
 
         <section className="grid flex-1 grid-cols-1 gap-4 xl:grid-cols-[1.55fr_0.85fr]">
@@ -182,17 +181,13 @@ function Header({ onStart, onReset, demoRunning }) {
   return (
     <header className="flex flex-col gap-4 rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm lg:flex-row lg:items-center lg:justify-between">
       <div className="flex flex-wrap items-center gap-5">
-        <div className="flex items-center gap-4">
-          <img src={paincubeLogo} alt="PainCube" className="h-12 w-auto" />
-          <div className="h-10 w-px bg-slate-200" />
-          <img src={stellarCubeLogo} alt="StellarCube USA" className="h-10 w-auto" />
-        </div>
+        <img src={paincubeLogo} alt="PainCube" className="h-12 w-auto sm:h-14" />
         <div className="min-w-[220px] border-l border-slate-200 pl-4 max-sm:border-l-0 max-sm:pl-0">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-cyan-700">
+          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-cyan-700 sm:text-xs">
             <BrainCircuit className="h-4 w-4" />
             Predictive Pain AI
           </div>
-          <h1 className="mt-1 text-xl font-semibold text-slate-950">ICU PainCube CDSS Demo</h1>
+          <h1 className="mt-1 text-xl font-bold text-slate-950 sm:text-2xl">ICU PainCube CDSS Demo</h1>
         </div>
       </div>
 
@@ -238,20 +233,20 @@ function PatientStat({ label, value }) {
 function MonitorPanel({ phase, metrics }) {
   return (
     <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 px-5 py-4">
+      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 px-4 py-3 sm:px-5 sm:py-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-cyan-700">
+          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-cyan-700 sm:text-xs">
             <HeartPulse className="h-4 w-4" />
             Real-time multimodal monitoring
           </div>
-          <h2 className="mt-1 text-2xl font-semibold text-slate-950">Patient signal monitoring</h2>
+          <h2 className="mt-1 text-xl font-bold text-slate-950 sm:text-2xl">Patient signal monitoring</h2>
         </div>
       </div>
 
-      <div className="grid min-h-[460px] grid-cols-1 bg-[#161818] lg:grid-cols-[1fr_148px]">
-        <div className="relative min-h-[360px]">
-          <WaveformCanvas phase={phase} />
+      <div className="grid min-h-[320px] grid-cols-1 bg-[#161818] sm:min-h-[420px] lg:grid-cols-[1fr_148px]">
+        <div className="relative min-h-[250px] sm:min-h-[340px]">
           <MonitorFooter metrics={metrics} />
+          <WaveformCanvas phase={phase} />
         </div>
         <VitalsRail metrics={metrics} />
       </div>
@@ -456,12 +451,12 @@ function WaveformCanvas({ phase }) {
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="h-full min-h-[360px] w-full" />;
+  return <canvas ref={canvasRef} className="h-[220px] w-full sm:h-[300px] lg:h-[372px]" />;
 }
 
 function MonitorFooter({ metrics }) {
   return (
-    <div className="grid border-t border-white/10 bg-[#1B1D1D] text-white sm:grid-cols-[88px_112px_88px_minmax(220px,1fr)]">
+    <div className="grid grid-cols-2 border-b border-white/10 bg-[#202323] text-white sm:grid-cols-[96px_124px_96px_minmax(240px,1fr)]">
       <MonitorMetric label="CPI" value={metrics.currentCpi.toFixed(1)} color="text-cyan-300" />
       <MonitorMetric label="PRED_30M" value={metrics.predictedCpi.toFixed(1)} color={metrics.predictedCpi >= 7 ? "text-red-400" : "text-cyan-300"} />
       <MonitorMetric label="RISK" value={`${metrics.risk}%`} color={metrics.risk > 80 ? "text-amber-300" : "text-emerald-300"} />
@@ -473,8 +468,8 @@ function MonitorFooter({ metrics }) {
 function MonitorMetric({ label, value, color, wide = false }) {
   return (
     <div className="min-w-0 border-r border-white/10 px-3 py-2 last:border-r-0">
-      <div className="text-[10px] uppercase tracking-[0.12em] text-white/35">{label}</div>
-      <div className={`${wide ? "whitespace-normal text-base leading-6" : "truncate text-lg"} font-semibold tabular-nums ${color}`}>{value}</div>
+      <div className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/40">{label}</div>
+      <div className={`${wide ? "whitespace-normal text-sm leading-5 sm:text-base sm:leading-6" : "truncate text-lg sm:text-xl"} font-bold tabular-nums ${color}`}>{value}</div>
     </div>
   );
 }
@@ -490,11 +485,11 @@ function VitalsRail({ metrics }) {
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-px border-t border-white/10 bg-white/10 p-px lg:block lg:border-l lg:border-t-0">
+    <div className="grid grid-cols-3 gap-px border-t border-white/10 bg-white/10 p-px sm:grid-cols-6 lg:block lg:border-l lg:border-t-0">
       {vitals.map((item) => (
-        <div key={item.label} className="bg-[#1B1D1D] px-3 py-3 lg:border-b lg:border-white/10">
+        <div key={item.label} className="bg-[#1B1D1D] px-3 py-2 lg:border-b lg:border-white/10 lg:py-3">
           <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-white/40">{item.label}</div>
-          <div className={`mt-1 text-2xl font-semibold tabular-nums ${item.color}`}>{item.value}</div>
+          <div className={`mt-1 text-xl font-bold tabular-nums lg:text-2xl ${item.color}`}>{item.value}</div>
         </div>
       ))}
     </div>
