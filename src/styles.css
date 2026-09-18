@@ -1,8 +1,45 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 색상 토큰 — PRD 3절 / CLAUDE.md 4절. 컴포넌트는 이 토큰만 쓴다. 계층을 섞지 않는다. */
+:root {
+  /* 브랜드·구조 계층: 데이터·상태 표현 금지 */
+  --brand-navy: #1b1b52;
+  --brand-panel: #102c5e;
+  --brand-light: #77a0d5;
+  --page-bg: #ebf0f6;
+  --card-surface: #ffffff;
+  --hairline: #d7e0ec;
+  --text-primary: #0f172a;
+  --text-label: #475569;
+  --text-muted: #8a93a6;
+
+  /* 상태 계층: 상태 표현 전용 */
+  --status-stable: #118c6e;
+  --status-caution: #d9631a;
+  --status-critical: #b01c3e;
+  --status-nodata: #8a93a6;
+  --status-stable-tint: #e2f1ee; /* 틴트는 배경 전용 */
+  --status-caution-tint: #faece4;
+  --status-critical-tint: #f6e4e8;
+
+  /* 파형 계층: 신호 종류 구분 + 모니터 내부 */
+  --signal-eeg: #8b5cf6;
+  --signal-ecg: #3fa834;
+  --signal-ppg: #2e86c1;
+  --monitor-bg: #0a1730;
+  --monitor-grid: rgba(255, 255, 255, 0.055);
+  --monitor-bar: #14203a;
+  --monitor-ink: rgba(255, 255, 255, 0.86);
+  --monitor-ink-dim: rgba(255, 255, 255, 0.45);
+  --monitor-alert: #f5a03c; /* 모니터 내부 임계 초과 값, ▲ 동반 */
+
+  /* 추세 그래프 */
+  --chart-observed: #1c3f7c;
+  --chart-now: #8a93a6;
+  --chart-grid: #e3e9f2;
+}
 
 * {
   box-sizing: border-box;
@@ -16,8 +53,9 @@ body,
 }
 
 body {
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #f8fafc;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--page-bg);
+  color: var(--text-primary);
 }
 
 button {
