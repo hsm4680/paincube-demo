@@ -14,7 +14,7 @@ export default function PatientDetail({ phase, metrics, trend, approvalState, do
     <div className="flex flex-1 flex-col gap-4">
       <div className="flex h-24 flex-col gap-1.5">
         <div className="flex h-[26px] items-center">
-          <StatusBadge status={metrics.status} />
+          <StatusBadge status={metrics.status} quiet />
         </div>
         <KpiRow metrics={metrics} />
       </div>
