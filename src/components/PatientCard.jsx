@@ -30,7 +30,7 @@ export default function PatientCard({ patient, painScore, predicted, status, ran
             <span className="t-hero">{painScore.toFixed(1)}</span>
             <span className="t-unit">{`/ ${SCALE_MAX}`}</span>
           </span>
-          <StatusBadge status={status} quiet />
+          <StatusBadge status={status} />
         </div>
 
         <ThresholdBar painScore={painScore} predicted={predicted} />

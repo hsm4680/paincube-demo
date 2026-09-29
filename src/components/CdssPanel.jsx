@@ -13,8 +13,8 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
   const showActions = phase === "recommendation" && !dismissed && !approved;
   // 안전성 뱃지의 RR·SpO2는 recommendation 단계 vitals에서 읽는다 (PRD 5.6)
   const safetyVitals = PHASES.recommendation.vitals;
-  // 평상시에는 상태색을 쓰지 않는다 — 빨강이 떴을 때만 보이게 한다
-  const quiet = metrics.status.color === "status-stable";
+  // 색은 ACTION REQUIRED에만 붙는다 (PRD 2.5)
+  const quiet = metrics.status.color !== "status-critical";
 
   const chooseDose = (value) => {
     onModify(value);

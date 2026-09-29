@@ -67,11 +67,20 @@ v1의 `RISK 12%` / `Pain probability` / `Low probability of severe pain, 12%` �
 
 | 상태어 | 의미 | 색상 토큰 |
 |---|---|---|
-| `STABLE` | 안정 | `--status-stable` |
-| `RISING` | 상승 추세 감지 | `--status-caution` |
-| `ACTION REQUIRED` | 개입 권고, 승인 대기 | `--status-critical` |
-| `TREATING` | 오더 실행, 반응 추적 중 | `--status-caution` |
-| `STABILIZED` | 안정화 확인 | `--status-stable` |
+| `STABLE` | 안정 | `--status-nodata` (중성 회색) |
+| `RISING` | 상승 추세 감지 | `--status-nodata` (중성 회색) |
+| `ACTION REQUIRED` | 개입 권고, 승인 대기 | **`--status-critical`** |
+| `TREATING` | 오더 실행, 반응 추적 중 | `--status-nodata` (중성 회색) |
+| `STABILIZED` | 안정화 확인 | `--status-nodata` (중성 회색) |
+
+**색은 `ACTION REQUIRED`에만 붙는다.** 나머지 네 상태어는 중성 회색이다.
+
+- 배지는 아이콘 + 텍스트를 함께 쓰므로 회색이어도 정보 손실이 없다.
+- `RISING`이 상세 화면에 노출되는 시간은 모달을 닫고 `recommendation`으로 넘어가기까지
+  2초 남짓이다. 주황을 유지해서 얻는 것이 없다.
+- 전체 흐름에서 빨강이 **권고 시점에 한 번만** 등장한다. 주황과 빨강이 섞이면 시선이 흐려진다.
+- 중성 회색 배지는 대비 확보를 위해 글자에 `--text-label`, 배경에 `--page-bg`를 쓴다.
+  (`--status-nodata` 위의 텍스트는 2.6:1로 미달)
 
 - **설명문(sub-copy)은 넣지 않는다.** 상태어 단독 노출.
 - 상태어는 항상 **아이콘 + 텍스트와 함께** 표시한다. 색상만으로 상태를 전달하지 않는다.

@@ -5,13 +5,16 @@ export const HORIZON_MIN = 15; // 예측 지평, 분 (PRD 2.2)
 export const SCALE_MAX = 10; // Pain Score(CPI) 척도 상한 (0–10)
 export const BASELINE_WINDOW_H = 24; // Personal baseline 산출 창, 시간 (PRD 2.2)
 
-// 상태어 → 상태 계층 토큰 (PRD 2.5)
+// 상태어 → 상태 계층 토큰 (PRD 2.5).
+// 색은 ACTION REQUIRED에만 붙는다. 나머지는 중성 회색이다.
+// 배지가 아이콘 + 텍스트를 함께 쓰므로 정보 손실은 없고, 전체 흐름에서 빨강이 권고 시점에
+// 한 번만 등장해 시선이 흐려지지 않는다.
 export const STATUS = {
-  STABLE: { label: "STABLE", color: "status-stable" },
-  RISING: { label: "RISING", color: "status-caution" },
+  STABLE: { label: "STABLE", color: "status-nodata" },
+  RISING: { label: "RISING", color: "status-nodata" },
   ACTION_REQUIRED: { label: "ACTION REQUIRED", color: "status-critical" },
-  TREATING: { label: "TREATING", color: "status-caution" },
-  STABILIZED: { label: "STABILIZED", color: "status-stable" }
+  TREATING: { label: "TREATING", color: "status-nodata" },
+  STABILIZED: { label: "STABILIZED", color: "status-nodata" }
 };
 
 // 데모 기준 시각 — Pain assessment 경과 시간과 감사추적이 같은 시계를 쓴다 (PRD 5.7)
