@@ -4,7 +4,7 @@ import { HORIZON_MIN, THRESHOLD } from "../data/phases.js";
 import { bedLabel, patientIdLabel } from "../data/patients.js";
 
 // 화면 중앙 + 배경 60% Dim (PRD 8). 알람음 없음. 모든 수치는 metrics에서 읽는다.
-export default function AlertModal({ metrics, patient, actionLabel, onAction, onClose }) {
+export default function AlertModal({ metrics, patient, rank, actionLabel, onAction, onClose }) {
   const actionRef = useRef(null);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function AlertModal({ metrics, patient, actionLabel, onAction, on
             <h2 id="pre-pain-alert-title" className="text-lg font-bold uppercase tracking-[0.06em] text-status-caution">
               Pre-pain alert
             </h2>
-            <div className="text-sm font-semibold text-text-label">{`${bedLabel(patient)} · ${patientIdLabel(patient)}`}</div>
+            <div className="text-sm font-semibold text-text-label">{`${bedLabel(patient)} \u00b7 ${patientIdLabel(patient)} \u00b7 now ranked #${rank}`}</div>
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { PHASES, RECOMMENDATION, metricsForPatient } from "./data/phases.js";
 import { PATIENTS, HERO_BED } from "./data/patients.js";
@@ -98,6 +98,13 @@ function App() {
 
   const onDetail = screen === "detail";
 
+  // 모달이 1번 카드를 가리므로 순위를 헤더에 넣는다. 정렬 결과에서 읽어온다 (하드코딩 금지).
+  const heroRank = useMemo(() => {
+    const ranked = PATIENTS.map((p) => ({ bed: p.bed, predicted: p.bed === HERO_BED ? heroMetrics.predicted : p.predicted }))
+      .sort((a, b) => b.predicted - a.predicted);
+    return ranked.findIndex((p) => p.bed === HERO_BED) + 1;
+  }, [heroMetrics.predicted]);
+
   return (
     <main className="min-h-screen bg-page-bg text-text-primary">
       <div className="mx-auto flex min-h-screen max-w-[1760px] flex-col gap-3 px-3 py-3 sm:px-6">
@@ -135,6 +142,7 @@ function App() {
         <AlertModal
           metrics={heroMetrics}
           patient={hero}
+          rank={heroRank}
           actionLabel={onDetail && onHero ? "Continue" : "View patient"}
           onAction={onDetail && onHero ? closeModal : () => openPatient(HERO_BED)}
           onClose={closeModal}
