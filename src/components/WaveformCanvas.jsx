@@ -50,15 +50,25 @@ export default function WaveformCanvas({ phase }) {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const sampleCount = Math.max(260, Math.floor(rect.width / 2));
       traces.forEach((trace) => {
-        if (!buffers.has(trace.key)) buffers.set(trace.key, Array(sampleCount).fill(0));
         if (!states.has(trace.key)) states.set(trace.key, makeState(trace.key));
+      });
+
+      if (!buffers.has(traces[0].key)) {
+        // 최초 마운트: 0으로 채우면 화면 전환 직후 평탄선이 보인다 (PRD 5.4).
+        // nextSample()을 버퍼 길이만큼 미리 돌려 생리학적 파형으로 채운 상태에서 시작한다.
+        const seeded = prefill(sampleCount);
+        traces.forEach((trace) => buffers.set(trace.key, seeded.get(trace.key)));
+        return;
+      }
+
+      const current = buffers.get(traces[0].key);
+      if (current.length === sampleCount) return;
+      const missing = sampleCount - current.length;
+      // 넓어진 경우 부족한 앞부분도 0이 아닌 파형으로 채운다.
+      const seeded = missing > 0 ? prefill(missing) : null;
+      traces.forEach((trace) => {
         const buffer = buffers.get(trace.key);
-        if (buffer.length !== sampleCount) {
-          const next = Array(sampleCount).fill(0);
-          const copy = buffer.slice(-sampleCount);
-          next.splice(sampleCount - copy.length, copy.length, ...copy);
-          buffers.set(trace.key, next);
-        }
+        buffers.set(trace.key, seeded ? seeded.get(trace.key).concat(buffer) : buffer.slice(-sampleCount));
       });
     };
 
@@ -131,6 +141,17 @@ export default function WaveformCanvas({ phase }) {
       state.phase += 0.035;
       state.transition = Math.max(0, state.transition - 1);
       return Math.sin(state.phase * 5.7) * 8 * strain + Math.sin(state.phase * 18.5) * 3.8 + state.baseline * 9 + arousal + (noise(tick * 0.77, 5) - 0.5) * (8 + transitionBoost * 8) * strain;
+    };
+
+    // 버퍼를 생리학적 파형으로 미리 채운다. appendSamples()와 동일하게
+    // 한 tick마다 3개 trace를 함께 진행시켜 위상이 어긋나지 않게 한다.
+    const prefill = (count) => {
+      const seeded = new Map(traces.map((trace) => [trace.key, []]));
+      for (let i = 0; i < count; i += 1) {
+        traces.forEach((trace) => seeded.get(trace.key).push(nextSample(trace)));
+        tick += 1;
+      }
+      return seeded;
     };
 
     const appendSamples = () => {
