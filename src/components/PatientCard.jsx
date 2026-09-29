@@ -43,7 +43,7 @@ export default function PatientCard({ patient, painScore, predicted, status, ran
 
         <div className="flex items-baseline justify-between gap-2 border-t border-hairline pt-1.5">
           <span className="t-label">{`Predicted · ${HORIZON_MIN} min`}</span>
-          <span className={`t-primary text-[22px] ${forecastTone ? forecastTone.text : ""}`}>{predicted.toFixed(1)}</span>
+          <span className={`t-primary text-[22px] ${forecastTone ? forecastTone.text : "text-text-label"}`}>{predicted.toFixed(1)}</span>
         </div>
       </div>
     </Tag>
@@ -69,11 +69,11 @@ function ThresholdBar({ painScore, predicted }) {
         />
         <div className="absolute -top-[3px] bottom-[-3px] w-px -translate-x-1/2 bg-text-label" style={{ left: `${pos(THRESHOLD)}%` }} />
         <div
-          className={`absolute top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rotate-45 border bg-card-surface ${forecastTone.border}`}
+          className={`absolute top-1/2 h-[7px] w-[7px] -translate-x-1/2 -translate-y-1/2 rotate-45 border bg-card-surface ${forecastTone.border}`}
           style={{ left: `${pos(predicted)}%` }}
         />
         <div
-          className={`absolute top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 ${currentTone.bg}`}
+          className={`absolute top-1/2 h-[7px] w-[7px] -translate-x-1/2 -translate-y-1/2 ${currentTone.bg}`}
           style={{ left: `${pos(painScore)}%` }}
         />
       </div>

@@ -33,7 +33,7 @@ function Kpi({ label, value, unit, valueClass, small = false, divided = false })
     <div className={`flex min-w-0 items-baseline gap-2 px-4 py-2 ${divided ? "rule-l" : ""}`}>
       <span className="t-label shrink-0">{label}</span>
       <span className="ml-auto flex items-baseline gap-1.5">
-        <span className={`${small ? "t-primary" : "t-hero"} ${valueClass ?? ""}`}>{value}</span>
+        <span className={`${small ? "t-value text-text-label" : "t-hero"} ${valueClass ?? ""}`}>{value}</span>
         {unit && <span className="t-unit">{unit}</span>}
       </span>
     </div>
