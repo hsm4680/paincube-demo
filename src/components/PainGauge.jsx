@@ -1,10 +1,11 @@
 import React from "react";
-import { STATUS_CLASS } from "./status.js";
 import { BASELINE_WINDOW_H, HORIZON_MIN, SCALE_MAX, THRESHOLD } from "../data/phases.js";
 
 // 게이지 카드 160px. Predicted / Time to Threshold 줄과 상태 배지는 KPI·상태어와 중복이라 뺐다.
 // 링 구조 (PRD 5.5): 현재값은 실선 호, 현재값 끝점에서 예측값까지는 점선 확장 호 + 화살표.
 // 두 호를 이어 그린다. v1처럼 같은 반지름에 겹쳐 그려 덮이게 하지 않는다.
+// 색 판정은 막대와 같은 규칙이다 — 임계 5.0 하나로만 갈라지고, 실선 호는 현재값,
+// 점선 호는 예측값으로 판정한다. 화면 단계 상태는 상태어 배지가 이미 전달한다.
 const CX = 60;
 const CY = 60;
 const R = 46;
@@ -32,11 +33,9 @@ const arrowHead = (at, forward) => {
 };
 
 export default function PainGauge({ metrics }) {
-  const status = STATUS_CLASS[metrics.status.color];
-  const breach = metrics.predicted >= THRESHOLD;
-  const forecast = STATUS_CLASS[breach ? "status-critical" : "status-stable"];
+  const currentStroke = metrics.painScore >= THRESHOLD ? "stroke-status-critical" : "stroke-text-muted";
+  const forecastStroke = metrics.predicted >= THRESHOLD ? "stroke-status-critical" : "stroke-text-muted";
   const forward = metrics.predicted >= metrics.painScore;
-  const quiet = metrics.status.color === "status-stable";
 
   return (
     <section className="panel flex h-[160px] flex-col">
@@ -50,20 +49,15 @@ export default function PainGauge({ metrics }) {
             aria-label={`Pain Score(CPI) ${metrics.painScore.toFixed(1)} of ${SCALE_MAX}, predicted ${metrics.predicted.toFixed(1)} in ${HORIZON_MIN} min`}
           >
             <circle cx={CX} cy={CY} r={R} fill="none" className="stroke-hairline" strokeWidth="9" />
-            <path
-              d={arc(0, metrics.painScore)}
-              fill="none"
-              className={quiet ? "stroke-chart-observed" : status.stroke}
-              strokeWidth="9"
-            />
+            <path d={arc(0, metrics.painScore)} fill="none" className={currentStroke} strokeWidth="9" />
             <path
               d={arc(metrics.painScore, metrics.predicted)}
               fill="none"
-              className={forecast.stroke}
+              className={forecastStroke}
               strokeWidth="5"
               strokeDasharray="4 4"
             />
-            <polygon points={arrowHead(metrics.predicted, forward)} className={`${forecast.stroke} fill-current`} />
+            <polygon points={arrowHead(metrics.predicted, forward)} className={`${forecastStroke} fill-current`} />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <div className="t-primary">{metrics.painScore.toFixed(1)}</div>

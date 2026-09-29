@@ -1,17 +1,11 @@
 import React from "react";
 import StatusBadge from "./StatusBadge.jsx";
-import { STATUS_CLASS } from "./status.js";
 import { bedLabel, patientIdLabel } from "../data/patients.js";
 import { HORIZON_MIN, SCALE_MAX, THRESHOLD } from "../data/phases.js";
-
-// 임계 근접 기준 — 이 아래로는 상태색을 쓰지 않는다. 빨강이 떴을 때만 눈에 띄게 하기 위해서다.
-const NEAR_THRESHOLD = 4.0;
 
 // 틴트·테두리는 예측값이 임계를 넘는 카드에만 적용한다. 전부 칠하면 구분 정보가 사라진다.
 export default function PatientCard({ patient, painScore, predicted, status, rank, onOpen }) {
   const breach = predicted >= THRESHOLD;
-  const near = !breach && Math.max(painScore, predicted) >= NEAR_THRESHOLD;
-  const forecastTone = breach ? STATUS_CLASS["status-critical"] : near ? STATUS_CLASS["status-caution"] : null;
   const summary = `${bedLabel(patient)}, patient ${patientIdLabel(patient)}, Pain Score ${painScore.toFixed(1)} of ${SCALE_MAX}, predicted ${predicted.toFixed(1)} in ${HORIZON_MIN} min, status ${status.label}`;
   const Tag = onOpen ? "button" : "div";
 
@@ -43,7 +37,7 @@ export default function PatientCard({ patient, painScore, predicted, status, ran
 
         <div className="flex items-baseline justify-between gap-2 border-t border-hairline pt-1.5">
           <span className="t-label">{`Predicted · ${HORIZON_MIN} min`}</span>
-          <span className={`t-primary text-[22px] ${forecastTone ? forecastTone.text : "text-text-label"}`}>{predicted.toFixed(1)}</span>
+          <span className={`t-primary text-[22px] ${breach ? "text-status-critical" : "text-text-label"}`}>{predicted.toFixed(1)}</span>
         </div>
       </div>
     </Tag>
@@ -51,18 +45,21 @@ export default function PatientCard({ patient, painScore, predicted, status, ran
 }
 
 // 0–10 눈금자. 채움(progress) 대신 축선과 눈금만 쓴다 — 슬라이더가 아니라 계측기로 읽히게.
-// 현재값은 채운 점, 예측값은 빈 마름모, 둘 사이는 점선.
+// 색 판정은 임계 5.0 하나로만 갈라진다. 현재값을 그리는 요소는 현재값으로,
+// 예측값을 그리는 요소는 예측값으로 판정한다. 임계 근접은 눈금 위의 위치가 이미 말한다.
+const MIN_MARKER_GAP = 4; // %, 두 마커가 한 덩어리로 보이지 않게 하는 최소 간격
+
 function ThresholdBar({ painScore, predicted }) {
-  const currentTone =
-    painScore >= THRESHOLD
-      ? STATUS_CLASS["status-critical"]
-      : painScore >= NEAR_THRESHOLD
-        ? STATUS_CLASS["status-caution"]
-        : STATUS_CLASS["status-stable"];
-  const breach = predicted >= THRESHOLD;
+  const currentBreach = painScore >= THRESHOLD;
+  const forecastBreach = predicted >= THRESHOLD;
   const pos = (v) => (v / SCALE_MAX) * 100;
-  const from = Math.min(pos(painScore), pos(predicted));
-  const to = Math.max(pos(painScore), pos(predicted));
+  const currentAt = pos(painScore);
+  // 값이 가까울 때만 예측 마커를 살짝 밀어 두 점 인코딩을 유지한다. 정확한 값은 카드 하단에 있다.
+  const rawGap = pos(predicted) - currentAt;
+  const forecastAt =
+    Math.abs(rawGap) >= MIN_MARKER_GAP ? pos(predicted) : currentAt + MIN_MARKER_GAP * (rawGap < 0 ? -1 : 1);
+  const from = Math.min(currentAt, forecastAt);
+  const to = Math.max(currentAt, forecastAt);
 
   return (
     <div aria-hidden="true">
@@ -71,28 +68,30 @@ function ThresholdBar({ painScore, predicted }) {
         <div className="axis-rule absolute left-0 right-0 top-1/2 h-px -translate-y-1/2" />
 
         {/* 양 끝단 */}
-        <div className="axis-cap absolute left-0 top-1/2 h-[5px] w-px -translate-y-1/2" />
-        <div className="axis-cap absolute right-0 top-1/2 h-[5px] w-px -translate-y-1/2" />
+        <div className="axis-cap absolute left-0 top-1/2 h-[9px] w-[1.5px] -translate-y-1/2" />
+        <div className="axis-cap absolute right-0 top-1/2 h-[9px] w-[1.5px] -translate-y-1/2" />
 
         {/* 임계 5.0 눈금 — 축선보다 길고 진하다 */}
         <div className="absolute top-1/2 h-[11px] w-px -translate-x-1/2 -translate-y-1/2 bg-text-label" style={{ left: `${pos(THRESHOLD)}%` }} />
 
         {/* 현재값 → 예측값 */}
         <div
-          className={`absolute top-1/2 h-0 -translate-y-1/2 border-t border-dashed ${breach ? "border-status-critical" : "border-text-muted"}`}
+          className={`absolute top-1/2 h-0 -translate-y-1/2 border-t border-dashed ${forecastBreach ? "border-status-critical" : "border-text-muted"}`}
           style={{ left: `${from}%`, width: `${to - from}%` }}
         />
 
         <div
           className={`absolute top-1/2 h-[7px] w-[7px] -translate-x-1/2 -translate-y-1/2 rotate-45 border bg-card-surface ${
-            breach ? "border-status-critical" : "border-text-muted"
+            forecastBreach ? "border-status-critical" : "border-text-muted"
           }`}
-          style={{ left: `${pos(predicted)}%` }}
+          style={{ left: `${forecastAt}%` }}
         />
 
         <div
-          className={`absolute top-1/2 h-[7px] w-[7px] -translate-x-1/2 -translate-y-1/2 rounded-full ${currentTone.bg}`}
-          style={{ left: `${pos(painScore)}%` }}
+          className={`absolute top-1/2 h-[7px] w-[7px] -translate-x-1/2 -translate-y-1/2 rounded-full ${
+            currentBreach ? "bg-status-critical" : "bg-text-muted"
+          }`}
+          style={{ left: `${currentAt}%` }}
         />
       </div>
 

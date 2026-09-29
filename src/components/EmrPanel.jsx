@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { formatAssessmentAge, lastAnalgesicFor } from "../data/phases.js";
 
-// 안전성 검증에 실제로 쓰인 항목 — recommendation 단계에서 자동 강조된다 (PRD 5.7)
+// 안전성 검증에 실제로 참조된 항목 — recommendation 단계에서 자동 표시된다 (PRD 5.7).
+// 이상치가 아니라 계산 입력이므로 상태색을 쓰지 않는다.
 const SAFETY_KEYS = ["lastAnalgesic", "activeMeds", "renal"];
 
 // 박스 6개가 아니라 표다 (Ref_05). 라벨 행은 네이비, 셀 구분은 세로선만.
@@ -57,8 +58,8 @@ function EmrCell({ label, value, role, divided, highlighted }) {
   return (
     <div className={`emr-cell flex min-w-0 flex-col ${divided ? "rule-l" : ""}`}>
       <div className="label-band truncate px-2 py-[3px]">{label}</div>
-      <div className={`flex min-w-0 flex-1 flex-col justify-center px-2 ${highlighted ? "bg-status-caution-tint" : ""}`}>
-        <div className={`t-value truncate ${highlighted ? "text-status-caution" : ""}`} title={value}>
+      <div className={`flex min-w-0 flex-1 flex-col justify-center px-2 ${highlighted ? "emr-referenced" : ""}`}>
+        <div className="t-value truncate" title={value}>
           {value}
         </div>
         <div className="t-caption truncate">{role}</div>

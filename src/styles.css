@@ -129,13 +129,20 @@ button {
     border-left: 1px solid var(--hairline);
   }
 
+  /* EMR 참조 표시 — 상태가 아니라 "이 값이 계산에 참조됐다"는 뜻이다.
+     상태색을 쓰지 않는다. 옅은 네이비 면 + 좌측 2px 네이비. */
+  .emr-referenced {
+    background: color-mix(in srgb, var(--brand-navy) 7%, var(--card-surface));
+    box-shadow: inset 2px 0 0 0 var(--brand-navy);
+  }
+
   /* 눈금자 축 — hairline보다 살짝 진한 중성색. 채움을 쓰지 않는다 (Ref_05). */
   .axis-rule {
     background: color-mix(in srgb, var(--text-muted) 55%, var(--card-surface));
   }
 
   .axis-cap {
-    background: color-mix(in srgb, var(--text-muted) 75%, var(--card-surface));
+    background: var(--text-label);
   }
 
   /* ── 타이포 스케일 ─────────────────────────────────────────────────────
