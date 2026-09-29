@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowLeft, BrainCircuit, Circle, Play, RefreshCw } from "lucide-react";
+import { ArrowLeft, Circle, Play, RefreshCw } from "lucide-react";
 import paincubeLogo from "../assets/paincube-logo.png";
 import { WARD, bedLabel, contextLine, patientIdLabel, profileLabel } from "../data/patients.js";
 import { HORIZON_MIN } from "../data/phases.js";
@@ -7,12 +7,12 @@ import { HORIZON_MIN } from "../data/phases.js";
 // patient가 없으면 Ward Dashboard 헤더, 있으면 Patient Detail 헤더다. 높이 84px (PRD 5.1 예산).
 export default function Header({ patient, onStart, onReset, onBack, demoRunning }) {
   return (
-    <header className="flex h-[84px] items-center gap-4 rounded-lg border border-hairline bg-card-surface px-4 shadow-sm">
+    <header className="flex h-[84px] items-center gap-4 surface px-4">
       {onBack && (
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex h-10 shrink-0 items-center gap-2 rounded-md border border-hairline px-3 text-sm font-semibold text-text-label transition hover:border-brand-light hover:text-brand-panel focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel"
+          className="inline-flex h-10 shrink-0 items-center gap-2 inset rounded-[var(--radius-control)] px-3 text-sm font-semibold text-text-label transition hover:text-brand-panel focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel"
         >
           <ArrowLeft className="h-4 w-4" />
           Ward
@@ -24,20 +24,16 @@ export default function Header({ patient, onStart, onReset, onBack, demoRunning 
       {patient ? (
         <div className="flex min-w-0 items-center gap-3 border-l border-hairline pl-4">
           <div className="min-w-0">
-            <div className="truncate text-base font-bold text-brand-navy">
+            <div className="truncate text-base font-semibold tracking-[-0.01em] text-brand-navy">
               {`${patientIdLabel(patient)} · ${profileLabel(patient)} · ${bedLabel(patient)}`}
             </div>
-            <div className="truncate text-sm text-text-label">{contextLine(patient)}</div>
+            <div className="mt-0.5 truncate text-[13px] text-text-label">{contextLine(patient)}</div>
           </div>
           {patient.selfReport === false && <NrsBadge />}
         </div>
       ) : (
         <div className="min-w-0 border-l border-hairline pl-4">
-          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.06em] text-brand-panel">
-            <BrainCircuit className="h-4 w-4 text-brand-light" />
-            Predictive Pain AI
-          </div>
-          <h1 className="mt-1 truncate text-xl font-bold text-brand-navy">{`${WARD.name} \u00b7 ${WARD.beds} beds`}</h1>
+          <h1 className="truncate text-xl font-semibold tracking-[-0.01em] text-brand-navy">{`${WARD.name} \u00b7 ${WARD.beds} beds`}</h1>
         </div>
       )}
 
@@ -51,7 +47,7 @@ export default function Header({ patient, onStart, onReset, onBack, demoRunning 
         <button
           type="button"
           onClick={onStart}
-          className="inline-flex h-10 items-center gap-2 rounded-md bg-brand-panel px-4 text-sm font-semibold text-white transition hover:bg-brand-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel"
+          className="inline-flex h-10 items-center gap-2 rounded-[var(--radius-control)] bg-brand-panel px-4 text-sm font-semibold text-white transition hover:bg-brand-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel"
         >
           <Play className="h-4 w-4" />
           Demo Start
@@ -61,7 +57,7 @@ export default function Header({ patient, onStart, onReset, onBack, demoRunning 
           onClick={onReset}
           aria-label="Reset demo"
           title="Reset demo"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-hairline bg-card-surface text-text-label transition hover:border-brand-light hover:text-brand-panel focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel"
+          className="inset inline-flex h-10 w-10 items-center justify-center text-text-label transition hover:text-brand-panel focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel"
         >
           <RefreshCw className={`h-4 w-4 ${demoRunning ? "animate-spin-slow" : ""}`} />
         </button>

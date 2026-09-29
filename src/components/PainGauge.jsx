@@ -39,9 +39,9 @@ export default function PainGauge({ metrics }) {
   const forward = metrics.predicted >= metrics.painScore;
 
   return (
-    <section className="flex h-[160px] flex-col rounded-lg border border-hairline bg-card-surface px-5 py-3 shadow-sm">
+    <section className="flex h-[160px] flex-col surface px-5 py-3">
       <div className="flex items-center gap-2">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.06em] text-brand-panel">
+        <div className="flex items-center gap-2 t-title">
           <Gauge className="h-4 w-4 text-brand-light" />
           Pain forecast
         </div>
@@ -67,17 +67,17 @@ export default function PainGauge({ metrics }) {
             <polygon points={arrowHead(metrics.predicted, forward)} className={`${forecast.stroke} fill-current`} />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className="text-3xl font-bold tabular-nums text-text-primary">{metrics.painScore.toFixed(1)}</div>
-            <div className="text-[10px] uppercase leading-tight tracking-[0.06em] text-text-label">{`/ ${SCALE_MAX}`}</div>
+            <div className="t-figure text-[30px] leading-none">{metrics.painScore.toFixed(1)}</div>
+            <div className="t-caption mt-1">{`/ ${SCALE_MAX}`}</div>
           </div>
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="text-xs font-semibold uppercase tracking-[0.06em] text-text-label">Pain Score(CPI)</div>
-          <div className="mt-1 text-[15px] font-semibold text-text-primary">{metrics.aiStatus}</div>
-          <div className="mt-3 rounded-md border border-hairline bg-page-bg px-3 py-2">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-text-label">Personal baseline</div>
-            <div className="text-[15px] font-semibold text-text-primary">{`${BASELINE_WINDOW_H}h adaptive`}</div>
+          <div className="t-label">Pain Score(CPI)</div>
+          <div className="t-value mt-0.5">{metrics.aiStatus}</div>
+          <div className="inset mt-3 px-3 py-2">
+            <div className="t-label">Personal baseline</div>
+            <div className="t-value">{`${BASELINE_WINDOW_H}h adaptive`}</div>
           </div>
         </div>
       </div>

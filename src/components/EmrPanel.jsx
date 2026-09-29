@@ -28,13 +28,13 @@ export default function EmrPanel({ phase, metrics, dose }) {
   const safetyActive = phase === "recommendation";
 
   return (
-    <section className="flex h-24 flex-col rounded-lg border border-hairline bg-card-surface px-4 py-2 shadow-sm">
+    <section className="flex h-24 flex-col surface px-4 py-2">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-brand-panel">
+        <div className="flex items-center gap-2 t-title">
           <Database className="h-3.5 w-3.5 text-brand-light" />
           EMR context — inputs to prediction and safety check
         </div>
-        <span className="hidden whitespace-nowrap rounded-md border border-hairline bg-page-bg px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-text-label lg:inline">
+        <span className="inset hidden whitespace-nowrap px-2 py-0.5 t-caption lg:inline">
           HL7 FHIR R4 · Epic / Cerner compatible
         </span>
       </div>
@@ -55,15 +55,15 @@ export default function EmrPanel({ phase, metrics, dose }) {
 function EmrFact({ label, value, role, highlighted }) {
   return (
     <div
-      className={`emr-cell flex min-w-0 flex-col rounded-md border px-2 py-1 ${
-        highlighted ? "border-status-caution bg-status-caution-tint" : "border-hairline bg-page-bg"
+      className={`emr-cell inset flex min-w-0 flex-col px-2.5 py-1.5 ${
+        highlighted ? "bg-status-caution-tint ring-1 ring-status-caution" : ""
       }`}
     >
-      <div className="truncate text-[10px] font-semibold uppercase tracking-[0.06em] text-text-label">{label}</div>
+      <div className="t-label truncate">{label}</div>
       <div className="line-clamp-2 text-[12px] font-semibold leading-tight text-text-primary" title={value}>
         {value}
       </div>
-      <div className="mt-auto truncate text-[10px] text-text-muted">{role}</div>
+      <div className="t-caption mt-auto truncate">{role}</div>
     </div>
   );
 }

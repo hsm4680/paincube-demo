@@ -7,8 +7,8 @@ import { HORIZON_MIN, THRESHOLD, formatTimeToThresholdShort } from "../data/phas
 // 모니터 패널 225px = 라벨 28 + 바 52 + 파형 본체 (PRD 5.1 예산). 파형은 추세 그래프 본체를 넘지 않는다.
 export default function MonitorPanel({ phase, metrics }) {
   return (
-    <section className="flex h-[225px] flex-col overflow-hidden rounded-lg border border-hairline bg-card-surface shadow-sm">
-      <div className="flex h-7 shrink-0 items-center gap-2 px-5 text-xs font-semibold uppercase tracking-[0.06em] text-brand-panel">
+    <section className="flex h-[225px] flex-col overflow-hidden surface">
+      <div className="flex h-7 shrink-0 items-center gap-2 px-5 t-title">
         <HeartPulse className="h-4 w-4 text-brand-light" />
         Patient signal monitoring
       </div>
@@ -41,8 +41,8 @@ function MonitorBar({ metrics }) {
 function MonitorMetric({ label, value, wide = false, alert = false }) {
   return (
     <div className="flex min-w-0 flex-col justify-center border-r border-monitor-grid px-3 last:border-r-0">
-      <div className="truncate text-[10px] font-bold uppercase tracking-[0.06em] text-monitor-ink-dim">{label}</div>
-      <div className={`truncate font-bold tabular-nums ${wide ? "text-sm" : "text-lg"} ${alert ? "text-monitor-alert" : "text-monitor-ink"}`}>
+      <div className="truncate text-[10px] font-semibold uppercase tracking-[0.08em] text-monitor-ink-dim">{label}</div>
+      <div className={`truncate tabular-nums ${wide ? "text-sm font-semibold" : "text-lg font-bold tracking-[-0.02em]"} ${alert ? "text-monitor-alert" : "text-monitor-ink"}`}>
         {value}
         {alert && (
           <span className="ml-1 text-sm" role="img" aria-label="Above threshold">▲</span>

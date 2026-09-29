@@ -137,8 +137,8 @@ export default function TrendChart({ trend, metrics }) {
   const ariaLabel = `Pain Score(CPI) trend, past ${PAST_MIN} min and ${HORIZON_MIN} min forecast. Current ${metrics.painScore.toFixed(1)} / ${SCALE_MAX}, predicted ${metrics.predicted.toFixed(1)} in ${HORIZON_MIN} min.`;
 
   return (
-    <section className="flex h-[200px] flex-col rounded-lg border border-hairline bg-card-surface px-5 pb-1 pt-1.5 shadow-sm">
-      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.06em] text-brand-panel">
+    <section className="flex h-[200px] flex-col surface px-5 pb-2 pt-2">
+      <div className="flex items-center gap-2 t-title">
         <LineChart className="h-4 w-4 text-brand-light" />
         Pain Score(CPI) Trend &amp; Forecast
       </div>
@@ -155,7 +155,7 @@ export default function TrendChart({ trend, metrics }) {
             {Y_TICKS.map((v) => (
               <g key={`y${v}`}>
                 <line x1={M.left} x2={M.left + plotW} y1={y(v)} y2={y(v)} className="stroke-chart-grid" strokeWidth="1" />
-                <text x={M.left - 10} y={y(v)} dy="0.35em" textAnchor="end" className="fill-text-label text-[12px] tabular-nums">
+                <text x={M.left - 10} y={y(v)} dy="0.35em" textAnchor="end" className="fill-text-muted text-[11px] tabular-nums">
                   {v}
                 </text>
               </g>
@@ -168,7 +168,7 @@ export default function TrendChart({ trend, metrics }) {
                   x={x(t)}
                   y={M.top + PLOT_H + 16}
                   textAnchor={t === -PAST_MIN ? "start" : t === HORIZON_MIN ? "end" : "middle"}
-                  className={`text-[12px] tabular-nums ${t === 0 ? "fill-text-primary font-semibold" : "fill-text-label"}`}
+                  className={`text-[11px] tabular-nums ${t === 0 ? "fill-text-primary font-semibold" : "fill-text-muted"}`}
                 >
                   {t === 0 ? "Now" : `${t > 0 ? "+" : "−"}${Math.abs(t)} min`}
                 </text>
@@ -185,7 +185,7 @@ export default function TrendChart({ trend, metrics }) {
 
             <circle cx={xNow} cy={y(head)} r="5" className="fill-chart-observed stroke-white" strokeWidth="2" />
             <circle cx={endX} cy={endY} r="5" className={`fill-white ${forecastTone.stroke}`} strokeWidth="2.5" />
-            <text x={endX + 9} y={endY} dy="0.35em" className={`text-[15px] font-bold tabular-nums ${breach ? "fill-status-critical" : "fill-status-stable"}`}>
+            <text x={endX + 9} y={endY} dy="0.35em" className={`text-[15px] font-extrabold tabular-nums tracking-[-0.02em] ${breach ? "fill-status-critical" : "fill-status-stable"}`}>
               {metrics.predicted.toFixed(1)}
             </text>
           </svg>

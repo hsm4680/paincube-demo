@@ -14,8 +14,8 @@ export default function VitalsRail({ metrics }) {
     <div className="grid grid-cols-3 gap-px border-t border-monitor-grid bg-monitor-grid p-px sm:grid-cols-6 lg:grid lg:grid-cols-1 lg:grid-rows-6 lg:overflow-hidden lg:border-l lg:border-t-0">
       {vitals.map((item) => (
         <div key={item.label} className="flex min-h-0 items-baseline justify-between gap-2 bg-monitor-bar px-3 py-1 lg:px-2.5">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.06em] text-monitor-ink-dim">{item.label}</div>
-          <div className={`truncate text-base font-bold leading-tight tabular-nums ${item.color}`}>{item.value}</div>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-monitor-ink-dim">{item.label}</div>
+          <div className={`truncate text-base font-bold leading-tight tabular-nums tracking-[-0.02em] ${item.color}`}>{item.value}</div>
         </div>
       ))}
     </div>

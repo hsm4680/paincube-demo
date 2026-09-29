@@ -21,9 +21,9 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
   };
 
   return (
-    <section className="relative flex h-[265px] flex-col rounded-lg border border-hairline bg-card-surface px-5 py-3 shadow-sm">
+    <section className="relative flex h-[265px] flex-col surface px-5 py-3">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.06em] text-brand-panel">
+        <div className="flex items-center gap-2 t-title">
           <FileCheck2 className="h-4 w-4 text-brand-light" />
           AI-CDSS
         </div>
@@ -31,11 +31,11 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
       </div>
 
       {dismissed ? (
-        <div className="mt-2 flex flex-1 items-center justify-center rounded-lg border border-hairline bg-page-bg px-4 text-sm font-semibold text-text-label">
+        <div className="inset mt-2 flex flex-1 items-center justify-center px-4 text-sm font-semibold text-text-label">
           Recommendation dismissed
         </div>
       ) : (
-        <div className={`mt-2 flex flex-1 flex-col rounded-lg border ${tone.border} ${tone.tint} p-3`}>
+        <div className={`mt-2 flex flex-1 flex-col rounded-[var(--radius-card)] ${tone.tint} p-3`}>
           <Headline phase={phase} tone={tone} recommendation={recommendation} metrics={metrics} />
 
           <div className="mt-2 grid flex-1 content-start gap-1.5">
@@ -80,7 +80,7 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
 
           {approved && (
             <div className="mt-1.5">
-              <div className="flex h-8 items-center justify-center gap-2 rounded-md bg-brand-navy text-xs font-semibold text-white" role="status" aria-live="polite" aria-busy={approvalState === "loading"}>
+              <div className="flex h-8 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-brand-navy text-xs font-semibold text-white" role="status" aria-live="polite" aria-busy={approvalState === "loading"}>
                 {approvalState === "loading" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
                 {approvalState === "loading" ? "Approving order" : "Administration complete"}
               </div>
@@ -109,7 +109,7 @@ function Headline({ phase, tone, recommendation, metrics }) {
 
   return (
     <div className="flex items-center gap-2.5">
-      <span className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border bg-card-surface ${tone.border} ${tone.text}`}>
+      <span className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-control)] bg-card-surface ${tone.text}`}>
         <copy.Icon className="h-4 w-4" />
       </span>
       <div className="min-w-0">
@@ -122,8 +122,8 @@ function Headline({ phase, tone, recommendation, metrics }) {
 
 function Fact({ label, value, tone }) {
   return (
-    <div className={`rounded-md border bg-card-surface px-2.5 py-1 ${tone.border}`}>
-      <div className="text-[10px] font-semibold uppercase tracking-[0.06em] text-text-label">{label}</div>
+    <div className="rounded-[var(--radius-control)] bg-card-surface px-3 py-1.5">
+      <div className="t-label">{label}</div>
       <div className="text-[13px] leading-snug text-text-primary">{value}</div>
     </div>
   );
@@ -133,12 +133,12 @@ function ActionButton({ children, onClick, variant }) {
   const style =
     variant === "primary"
       ? "bg-brand-navy text-white hover:bg-brand-panel"
-      : "border border-hairline bg-card-surface text-text-label hover:border-brand-light hover:text-brand-panel";
+      : "bg-card-surface text-text-label hover:text-brand-panel";
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex h-10 items-center justify-center rounded-md text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel ${style}`}
+      className={`inline-flex h-10 items-center justify-center rounded-[var(--radius-control)] text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel ${style}`}
     >
       {children}
     </button>
@@ -149,10 +149,10 @@ function ActionButton({ children, onClick, variant }) {
 function DosePicker({ onSelect, onClose }) {
   return (
     <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/60 p-4" role="dialog" aria-modal="true" aria-label="Modify dose">
-      <div className="w-full rounded-lg border border-hairline bg-card-surface p-3 shadow-xl">
+      <div className="surface w-full p-3" style={{ boxShadow: "var(--shadow-modal)" }}>
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold uppercase tracking-[0.06em] text-text-label">{`Modify dose (${RECOMMENDATION.unit})`}</span>
-          <button type="button" onClick={onClose} aria-label="Close dose picker" className="inline-flex h-8 w-8 items-center justify-center rounded-md text-text-label hover:bg-page-bg">
+          <span className="t-label">{`Modify dose (${RECOMMENDATION.unit})`}</span>
+          <button type="button" onClick={onClose} aria-label="Close dose picker" className="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-control)] text-text-label hover:bg-page-bg">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -162,7 +162,7 @@ function DosePicker({ onSelect, onClose }) {
               key={option}
               type="button"
               onClick={() => onSelect(option)}
-              className="inline-flex h-10 items-center justify-center rounded-md border border-hairline bg-page-bg text-sm font-bold tabular-nums text-text-primary transition hover:border-brand-panel hover:text-brand-panel focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel"
+              className="inline-flex h-10 items-center justify-center inset text-sm font-bold tabular-nums text-text-primary transition hover:text-brand-panel focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel"
             >
               {option}
             </button>
@@ -179,5 +179,5 @@ function AuditTrail({ dose }) {
   const text = modified
     ? `${AUDIT.approvedAt} · Approved by ${AUDIT.clinician} (ID ${AUDIT.clinicianId}) · Recommended ${RECOMMENDATION.dose} ${RECOMMENDATION.unit} · Administered ${dose} ${RECOMMENDATION.unit} (modified)`
     : `${AUDIT.approvedAt} · Approved by ${AUDIT.clinician} (ID ${AUDIT.clinicianId}) · Sent to EMR — Ack ${AUDIT.ackAt}`;
-  return <div className="mt-1 truncate text-[10px] text-text-muted" title={text}>{text}</div>;
+  return <div className="t-caption mt-1.5 truncate" title={text}>{text}</div>;
 }

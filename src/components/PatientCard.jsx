@@ -16,21 +16,21 @@ export default function PatientCard({ patient, painScore, predicted, status, ran
       type={onOpen ? "button" : undefined}
       onClick={onOpen}
       aria-label={onOpen ? `Open ${summary}` : summary}
-      className={`flex h-full w-full flex-col justify-between rounded-lg border-2 px-5 py-4 text-left shadow-sm ${
-        breach ? "border-status-critical bg-status-critical-tint" : "border-hairline bg-card-surface"
-      } ${onOpen ? "cursor-pointer transition hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel" : ""}`}
+      className={`surface ward-surface flex h-full w-full flex-col justify-between px-5 py-4 text-left ${
+        breach ? "ring-2 ring-status-critical bg-status-critical-tint" : ""
+      } ${onOpen ? "cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel" : ""}`}
     >
       <div className="flex items-start justify-between gap-3">
         <span className="flex items-center gap-2">
-          <span className="text-sm font-bold tabular-nums text-text-label">{rank}</span>
-          <span className="text-sm font-bold uppercase tracking-[0.06em] text-brand-navy">{bedLabel(patient)}</span>
+          <span className="t-label tabular-nums text-text-muted">{rank}</span>
+          <span className="text-[13px] font-semibold uppercase tracking-[0.06em] text-brand-navy">{bedLabel(patient)}</span>
         </span>
-        <span className="text-sm font-semibold tabular-nums text-text-label">{patientIdLabel(patient)}</span>
+        <span className="t-label tabular-nums">{patientIdLabel(patient)}</span>
       </div>
 
       <div className="flex items-baseline justify-center gap-1.5">
-        <span className="text-5xl font-bold tabular-nums text-text-primary">{painScore.toFixed(1)}</span>
-        <span className="text-base font-semibold text-text-label">{`/ ${SCALE_MAX}`}</span>
+        <span className="t-figure text-[52px] leading-none">{painScore.toFixed(1)}</span>
+        <span className="t-label">{`/ ${SCALE_MAX}`}</span>
       </div>
 
       <ThresholdBar painScore={painScore} predicted={predicted} />
