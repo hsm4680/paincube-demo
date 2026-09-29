@@ -50,35 +50,53 @@ export default function PatientCard({ patient, painScore, predicted, status, ran
   );
 }
 
-// 0–10 척도 위에서 현재값(채운 점) → 예측값(빈 마름모). 읽기 전용 계측이므로
-// 슬라이더처럼 보이지 않게 트랙을 얇게 두고 손잡이 장식을 쓰지 않는다.
+// 0–10 눈금자. 채움(progress) 대신 축선과 눈금만 쓴다 — 슬라이더가 아니라 계측기로 읽히게.
+// 현재값은 채운 점, 예측값은 빈 마름모, 둘 사이는 점선.
 function ThresholdBar({ painScore, predicted }) {
-  const currentTone = painScore >= THRESHOLD ? STATUS_CLASS["status-critical"] : STATUS_CLASS["status-stable"];
-  const forecastTone = predicted >= THRESHOLD ? STATUS_CLASS["status-critical"] : STATUS_CLASS["status-stable"];
+  const currentTone =
+    painScore >= THRESHOLD
+      ? STATUS_CLASS["status-critical"]
+      : painScore >= NEAR_THRESHOLD
+        ? STATUS_CLASS["status-caution"]
+        : STATUS_CLASS["status-stable"];
+  const breach = predicted >= THRESHOLD;
   const pos = (v) => (v / SCALE_MAX) * 100;
   const from = Math.min(pos(painScore), pos(predicted));
   const to = Math.max(pos(painScore), pos(predicted));
 
   return (
     <div aria-hidden="true">
-      <div className="relative h-[3px] w-full bg-hairline">
-        <div className={`absolute inset-y-0 left-0 ${currentTone.bg}`} style={{ width: `${pos(painScore)}%` }} />
+      <div className="relative h-3">
+        {/* 축선 */}
+        <div className="axis-rule absolute left-0 right-0 top-1/2 h-px -translate-y-1/2" />
+
+        {/* 양 끝단 */}
+        <div className="axis-cap absolute left-0 top-1/2 h-[5px] w-px -translate-y-1/2" />
+        <div className="axis-cap absolute right-0 top-1/2 h-[5px] w-px -translate-y-1/2" />
+
+        {/* 임계 5.0 눈금 — 축선보다 길고 진하다 */}
+        <div className="absolute top-1/2 h-[11px] w-px -translate-x-1/2 -translate-y-1/2 bg-text-label" style={{ left: `${pos(THRESHOLD)}%` }} />
+
+        {/* 현재값 → 예측값 */}
         <div
-          className={`absolute top-1/2 h-0 -translate-y-1/2 border-t border-dashed ${forecastTone.border}`}
+          className={`absolute top-1/2 h-0 -translate-y-1/2 border-t border-dashed ${breach ? "border-status-critical" : "border-text-muted"}`}
           style={{ left: `${from}%`, width: `${to - from}%` }}
         />
-        <div className="absolute -top-[3px] bottom-[-3px] w-px -translate-x-1/2 bg-text-label" style={{ left: `${pos(THRESHOLD)}%` }} />
+
         <div
-          className={`absolute top-1/2 h-[7px] w-[7px] -translate-x-1/2 -translate-y-1/2 rotate-45 border bg-card-surface ${forecastTone.border}`}
+          className={`absolute top-1/2 h-[7px] w-[7px] -translate-x-1/2 -translate-y-1/2 rotate-45 border bg-card-surface ${
+            breach ? "border-status-critical" : "border-text-muted"
+          }`}
           style={{ left: `${pos(predicted)}%` }}
         />
+
         <div
-          className={`absolute top-1/2 h-[7px] w-[7px] -translate-x-1/2 -translate-y-1/2 ${currentTone.bg}`}
+          className={`absolute top-1/2 h-[7px] w-[7px] -translate-x-1/2 -translate-y-1/2 rounded-full ${currentTone.bg}`}
           style={{ left: `${pos(painScore)}%` }}
         />
       </div>
 
-      <div className="relative mt-1.5 h-3">
+      <div className="relative mt-1 h-3">
         <span className="t-caption absolute left-0">0</span>
         <span className="t-caption absolute -translate-x-1/2 font-semibold text-text-label" style={{ left: `${pos(THRESHOLD)}%` }}>
           {THRESHOLD.toFixed(1)}
