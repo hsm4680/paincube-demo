@@ -10,8 +10,9 @@ const PAST_MIN = 60;
 const TICK_MS = 1000; // 실제 1초
 const X_TICKS = [-60, -45, -30, -15, 0, 15];
 const Y_TICKS = [0, 2, 4, 6, 8, 10];
-const PLOT_H = 232;
-const M = { top: 14, right: 52, bottom: 30, left: 40 };
+// 카드 200px 예산 안에서의 본체 높이 (PRD 5.1). 파형 본체보다 작아지지 않는다.
+const PLOT_H = 140;
+const M = { top: 8, right: 52, bottom: 20, left: 36 };
 
 const clamp = (v) => Math.min(SCALE_MAX, Math.max(0, v));
 // 결정적 잡음 — 리셋할 때마다 같은 과거 곡선이 나온다
@@ -134,13 +135,13 @@ export default function TrendChart({ trend, metrics }) {
   const ariaLabel = `Pain Score(CPI) trend, past ${PAST_MIN} min and ${HORIZON_MIN} min forecast. Current ${metrics.painScore.toFixed(1)} / ${SCALE_MAX}, predicted ${metrics.predicted.toFixed(1)} in ${HORIZON_MIN} min.`;
 
   return (
-    <section className="rounded-lg border border-hairline bg-card-surface px-5 pb-3 pt-4 shadow-sm">
-      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-brand-panel">
+    <section className="flex h-[200px] flex-col rounded-lg border border-hairline bg-card-surface px-5 pb-1 pt-1.5 shadow-sm">
+      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.06em] text-brand-panel">
         <LineChart className="h-4 w-4 text-brand-light" />
         Pain Score(CPI) Trend &amp; Forecast
       </div>
 
-      <div ref={wrapRef} className="mt-2 w-full">
+      <div ref={wrapRef} className="mt-0.5 w-full">
         {width > 0 && (
           <svg width={width} height={H} role="img" aria-label={ariaLabel} className="block">
             <defs>
@@ -166,7 +167,7 @@ export default function TrendChart({ trend, metrics }) {
                 {t !== 0 && <line x1={x(t)} x2={x(t)} y1={M.top} y2={M.top + PLOT_H} className="stroke-chart-grid" strokeWidth="1" />}
                 <text
                   x={x(t)}
-                  y={M.top + PLOT_H + 20}
+                  y={M.top + PLOT_H + 16}
                   textAnchor={t === -PAST_MIN ? "start" : t === HORIZON_MIN ? "end" : "middle"}
                   className={`text-[12px] tabular-nums ${t === 0 ? "fill-text-primary font-semibold" : "fill-text-label"}`}
                 >

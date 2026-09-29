@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { PHASES } from "./data/phases.js";
+import { PHASES, RECOMMENDATION } from "./data/phases.js";
 import { PATIENTS, HERO_BED } from "./data/patients.js";
 import Header from "./components/Header.jsx";
 import WardDashboard from "./components/WardDashboard.jsx";
@@ -16,6 +16,8 @@ function App() {
   const [demoRunning, setDemoRunning] = useState(false);
   const [approvalState, setApprovalState] = useState("ready");
   const [resetKey, setResetKey] = useState(0);
+  const [dose, setDose] = useState(RECOMMENDATION.dose); // Modify로 바꾼 용량 (PRD 5.6)
+  const [dismissed, setDismissed] = useState(false);
   const timers = useRef([]);
   const metrics = PHASES[phase];
   const patient = PATIENTS.find((p) => p.bed === HERO_BED);
@@ -38,6 +40,8 @@ function App() {
     setModalOpen(false);
     setDemoRunning(false);
     setApprovalState("ready");
+    setDose(RECOMMENDATION.dose);
+    setDismissed(false);
     setResetKey((k) => k + 1);
   };
 
@@ -48,6 +52,8 @@ function App() {
     setPhase("idle");
     setModalOpen(false);
     setApprovalState("ready");
+    setDismissed(false);
+    setDose(RECOMMENDATION.dose);
     setDemoRunning(true);
     schedule(() => setPhase("warning"), 2000);
     schedule(() => setModalOpen(true), 3500);
@@ -83,7 +89,7 @@ function App() {
 
   return (
     <main className="min-h-screen bg-page-bg text-text-primary">
-      <div className="mx-auto flex min-h-screen max-w-[1760px] flex-col gap-4 px-3 py-3 sm:px-6 sm:py-4">
+      <div className="mx-auto flex min-h-screen max-w-[1760px] flex-col gap-3 px-3 py-3 sm:px-6">
         <Header
           patient={onDetail ? patient : null}
           onStart={startDemo}
@@ -98,11 +104,20 @@ function App() {
             metrics={metrics}
             trend={trend}
             approvalState={approvalState}
+            dose={dose}
+            dismissed={dismissed}
             onApprove={approveOrder}
+            onDismiss={() => setDismissed(true)}
+            onModify={setDose}
           />
         ) : (
           <WardDashboard heroMetrics={metrics} onOpenPatient={openPatient} resetKey={resetKey} />
         )}
+      </div>
+
+      {/* 우측 하단 고정 — 두 화면 모두 표시 (PRD 10.1) */}
+      <div className="pointer-events-none fixed bottom-2 right-3 z-40 text-[11px] font-medium text-text-muted">
+        For investigational use only — not for clinical decision-making
       </div>
 
       {modalOpen && (

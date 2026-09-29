@@ -4,21 +4,43 @@ import TrendChart from "./TrendChart.jsx";
 import PainGauge from "./PainGauge.jsx";
 import CdssPanel from "./CdssPanel.jsx";
 import EmrPanel from "./EmrPanel.jsx";
+import KpiRow from "./KpiRow.jsx";
+import StatusBadge from "./StatusBadge.jsx";
 
-// 6단계에서 레이아웃을 재구성한다. 지금은 3~5단계 화면 전환을 위한 분리만 한 상태다.
-export default function PatientDetail({ phase, metrics, trend, approvalState, onApprove }) {
+// 높이 예산 (PRD 5.1): 상태어+KPI 96 / 좌우 각 425 / EMR 96.
+// 좌: 그래프 200 + 파형 225, 우: 게이지 180 + CDSS 245 — 두 열의 합을 같게 맞춘다.
+export default function PatientDetail({ phase, metrics, trend, approvalState, dose, onApprove, onDismiss, onModify, dismissed }) {
   return (
-    <section className="grid flex-1 grid-cols-1 gap-4 xl:grid-cols-[1.55fr_0.85fr]">
-      <div className="flex min-w-0 flex-col gap-4">
-        <TrendChart trend={trend} metrics={metrics} />
-        <MonitorPanel phase={phase} metrics={metrics} />
+    <div className="flex flex-1 flex-col gap-3">
+      <div className="flex h-24 flex-col gap-2">
+        <div className="flex h-[30px] items-center">
+          <StatusBadge status={metrics.status} />
+        </div>
+        <KpiRow metrics={metrics} />
       </div>
 
-      <aside className="grid gap-4 lg:grid-cols-2 xl:grid-cols-1">
-        <PainGauge metrics={metrics} />
-        <CdssPanel phase={phase} metrics={metrics} approvalState={approvalState} onApprove={onApprove} />
-        <EmrPanel metrics={metrics} />
-      </aside>
-    </section>
+      <div className="grid gap-3 xl:grid-cols-[1.4fr_1fr]">
+        <div className="flex min-w-0 flex-col gap-3">
+          <TrendChart trend={trend} metrics={metrics} />
+          <MonitorPanel phase={phase} metrics={metrics} />
+        </div>
+
+        <div className="flex min-w-0 flex-col gap-3">
+          <PainGauge metrics={metrics} />
+          <CdssPanel
+            phase={phase}
+            metrics={metrics}
+            approvalState={approvalState}
+            dose={dose}
+            dismissed={dismissed}
+            onApprove={onApprove}
+            onDismiss={onDismiss}
+            onModify={onModify}
+          />
+        </div>
+      </div>
+
+      <EmrPanel phase={phase} metrics={metrics} dose={dose} />
+    </div>
   );
 }

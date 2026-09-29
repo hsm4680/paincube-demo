@@ -14,12 +14,23 @@ export const STATUS = {
   STABILIZED: { label: "STABILIZED", color: "status-stable" }
 };
 
+// 데모 기준 시각 — Pain assessment 경과 시간과 감사추적이 같은 시계를 쓴다 (PRD 5.7)
+export const DEMO_CLOCK = { now: "09:14", painAssessment: "08:40" };
+
+const toMinutes = (hhmm) => {
+  const [h, m] = hhmm.split(":").map(Number);
+  return h * 60 + m;
+};
+
+// "08:40 · 34 min ago" — 고정 문자열이 아니라 두 시각의 차이로 계산한다 (PRD 5.7)
+export const formatAssessmentAge = (at, now = DEMO_CLOCK.now) => `${at} · ${toMinutes(now) - toMinutes(at)} min ago`;
+
 // EMR 고정 항목 (PRD 5.7)
 const EMR_BASE = {
   procedure: "CABG, POD 0",
-  painReport: "Unable to self-report",
+  painAssessment: DEMO_CLOCK.painAssessment,
   activeMeds: "Propofol 35 mcg/kg/min, Cefazolin 1g q8h",
-  sedation: "RASS −4",
+  sedation: "RASS −4 · unable to self-report",
   renal: "eGFR 74"
 };
 
@@ -94,6 +105,13 @@ export const AUDIT = {
   ackAt: "09:14:35",
   clinician: "Dr. J. Kim",
   clinicianId: 3391
+};
+
+// 승인 용량을 수정한 경우 투여 후 단계의 Last analgesic에 그 용량이 반영된다 (PRD 5.7)
+export const lastAnalgesicFor = (phase, dose = RECOMMENDATION.dose) => {
+  if (phase === "administering") return `${RECOMMENDATION.drug} ${dose} ${RECOMMENDATION.unit} IV, now`;
+  if (phase === "recovered") return `${RECOMMENDATION.drug} ${dose} ${RECOMMENDATION.unit} IV, 1 min ago`;
+  return PHASES[phase].emr.lastAnalgesic;
 };
 
 export const formatTimeToThreshold = (minutes) =>

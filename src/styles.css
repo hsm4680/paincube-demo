@@ -62,6 +62,11 @@ button {
   font: inherit;
 }
 
+/* EMR 셀 강조 — 단계 전환과 함께 자동으로 켜진다 (PRD 5.7) */
+.emr-cell {
+  transition: background-color 220ms ease, border-color 220ms ease;
+}
+
 /* 카드 재정렬 — 순간이동하지 않고 미끄러지게 한다 (PRD 4.3) */
 .ward-card {
   transition: transform 620ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -69,7 +74,8 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ward-card {
+  .ward-card,
+  .emr-cell {
     transition: none;
   }
   .animate-spin-slow {

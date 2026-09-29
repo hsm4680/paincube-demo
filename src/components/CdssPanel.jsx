@@ -1,113 +1,183 @@
-import React from "react";
-import { AlertTriangle, BrainCircuit, Check, FileCheck2, Loader2, Pill, ShieldCheck } from "lucide-react";
+import React, { useState } from "react";
+import { AlertTriangle, BrainCircuit, Check, FileCheck2, Loader2, ShieldCheck, X } from "lucide-react";
 import { STATUS_CLASS } from "./status.js";
-import { HORIZON_MIN, RECOMMENDATION, SCALE_MAX, THRESHOLD, formatTimeToThreshold } from "../data/phases.js";
+import { AUDIT, DOSE_OPTIONS, HORIZON_MIN, PHASES, RECOMMENDATION, SAFETY, SCALE_MAX, THRESHOLD, formatTimeToThreshold } from "../data/phases.js";
 
-export default function CdssPanel({ phase, metrics, approvalState, onApprove }) {
-  // 블록 색은 현재 단계 상태어의 색을 따른다 (idle=stable, warning=caution, 이후 단계별)
+// AI-CDSS 카드 245px (PRD 5.1 예산 / 5.6 사양). 모든 수치는 PHASES·RECOMMENDATION에서 읽는다.
+export default function CdssPanel({ phase, metrics, approvalState, dose, dismissed, onApprove, onDismiss, onModify }) {
+  const [doseOpen, setDoseOpen] = useState(false);
   const tone = STATUS_CLASS[metrics.status.color];
   const painFact = `${metrics.painScore.toFixed(1)} / ${SCALE_MAX}, predicted ${metrics.predicted.toFixed(1)} in ${HORIZON_MIN} min`;
-  const timeToThreshold = formatTimeToThreshold(metrics.timeToThreshold);
   const recommendation = `${RECOMMENDATION.drug} ${RECOMMENDATION.dose} ${RECOMMENDATION.unit} ${RECOMMENDATION.route}`;
-  const showRecommendation = phase === "recommendation" || phase === "administering" || phase === "recovered";
-  const safeMode = phase === "idle";
-  const reviewMode = phase === "warning";
+  const approved = approvalState !== "ready";
+  const showActions = phase === "recommendation" && !dismissed && !approved;
+  // 안전성 뱃지의 RR·SpO2는 recommendation 단계 vitals에서 읽는다 (PRD 5.6)
+  const safetyVitals = PHASES.recommendation.vitals;
+
+  const chooseDose = (value) => {
+    onModify(value);
+    setDoseOpen(false);
+    onApprove();
+  };
 
   return (
-    <section className="flex min-h-[320px] flex-col rounded-lg border border-hairline bg-card-surface p-5 shadow-sm">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-brand-panel">
-            <FileCheck2 className="h-4 w-4 text-brand-light" />
-            AI-CDSS
-          </div>
-          <h2 className="mt-1 text-xl font-semibold text-brand-navy">Treatment recommendation</h2>
+    <section className="relative flex h-[245px] flex-col rounded-lg border border-hairline bg-card-surface px-5 py-3 shadow-sm">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.06em] text-brand-panel">
+          <FileCheck2 className="h-4 w-4 text-brand-light" />
+          AI-CDSS
         </div>
-        <ShieldCheck className="h-6 w-6 text-text-muted" />
+        <ShieldCheck className="h-4 w-4 text-text-muted" />
       </div>
 
-      {safeMode ? (
-        <div className={`mt-5 flex flex-1 flex-col rounded-lg border ${tone.border} ${tone.tint} p-4`}>
-          <div className="flex items-start gap-3">
-            <div className={`rounded-md border ${tone.border} bg-card-surface p-2 ${tone.text}`}>
-              <Check className="h-5 w-5" />
-            </div>
-            <div>
-              <div className={`text-sm font-semibold ${tone.text}`}>Safe range recommendation</div>
-              <div className="mt-1 text-lg font-semibold text-text-primary">Maintain current analgesic plan</div>
-            </div>
-          </div>
-
-          <div className="mt-4 grid gap-2 text-sm">
-            <DecisionFact tone={tone} label="Pain Score(CPI)" value={painFact} />
-            <DecisionFact tone={tone} label="Time to Threshold" value={timeToThreshold} />
-            <DecisionFact tone={tone} label="Recommendation" value="Continue monitoring; no opioid bolus indicated now" />
-          </div>
-        </div>
-      ) : reviewMode ? (
-        <div className={`mt-5 flex flex-1 flex-col rounded-lg border ${tone.border} ${tone.tint} p-4`}>
-          <div className="flex items-start gap-3">
-            <div className={`rounded-md border ${tone.border} bg-card-surface p-2 ${tone.text}`}>
-              <BrainCircuit className="h-5 w-5" />
-            </div>
-            <div>
-              <div className={`text-sm font-semibold ${tone.text}`}>Elevated risk under review</div>
-              <div className="mt-1 text-lg font-semibold text-text-primary">Recalculating treatment window</div>
-            </div>
-          </div>
-
-          <div className="mt-4 grid gap-2 text-sm">
-            <DecisionFact tone={tone} label="Pain Score(CPI)" value={painFact} />
-            <DecisionFact tone={tone} label="Signal change" value="EEG arousal burst + ECG rate variability + PPG amplitude shift" />
-            <DecisionFact tone={tone} label="Next action" value="CDSS medication recommendation pending validation" />
-          </div>
+      {dismissed ? (
+        <div className="mt-2 flex flex-1 items-center justify-center rounded-lg border border-hairline bg-page-bg px-4 text-sm font-semibold text-text-label">
+          Recommendation dismissed
         </div>
       ) : (
-        <div className={`mt-5 flex flex-1 flex-col rounded-lg border ${tone.border} ${tone.tint} p-4`}>
-          <div className="flex items-start gap-3">
-            <div className={`rounded-md border ${tone.border} bg-card-surface p-2 ${tone.text}`}>
-              <AlertTriangle className="h-5 w-5" />
-            </div>
-            <div>
-              <div className={`text-sm font-semibold ${tone.text}`}>Preemptive analgesic recommendation</div>
-              <div className="mt-1 text-lg font-semibold text-text-primary">{recommendation}</div>
-            </div>
+        <div className={`mt-2 flex flex-1 flex-col rounded-lg border ${tone.border} ${tone.tint} p-3`}>
+          <Headline phase={phase} tone={tone} recommendation={recommendation} metrics={metrics} />
+
+          <div className="mt-2 grid flex-1 content-start gap-1.5">
+            {phase === "idle" && (
+              <>
+                <Fact tone={tone} label="Pain Score(CPI)" value={painFact} />
+                <Fact tone={tone} label="Time to Threshold" value={formatTimeToThreshold(metrics.timeToThreshold)} />
+                <Fact tone={tone} label="Recommendation" value="Continue monitoring; no opioid bolus indicated now" />
+              </>
+            )}
+            {phase === "warning" && (
+              <>
+                <Fact tone={tone} label="Pain Score(CPI)" value={painFact} />
+                <Fact tone={tone} label="Signal change" value="EEG arousal burst + ECG rate variability + PPG amplitude shift" />
+                <Fact tone={tone} label="Next action" value="CDSS medication recommendation pending validation" />
+              </>
+            )}
+            {(phase === "recommendation" || phase === "administering" || phase === "recovered") && (
+              <>
+                <Fact tone={tone} label="Trigger" value={`Predicted Pain Score(CPI) ≥ ${THRESHOLD.toFixed(1)} within ${HORIZON_MIN} min`} />
+                <Fact tone={tone} label="Rationale" value="EEG arousal + ECG/PPG sympathetic shift + EMR medication interval" />
+              </>
+            )}
           </div>
 
-          <div className="mt-4 grid gap-2 text-sm">
-            <DecisionFact tone={tone} label="Trigger" value={`Predicted Pain Score(CPI) \u2265 ${THRESHOLD.toFixed(1)} within ${HORIZON_MIN} min`} />
-            <DecisionFact tone={tone} label="Time to Threshold" value={timeToThreshold} />
-            <DecisionFact tone={tone} label="Rationale" value="EEG arousal pattern + ECG/PPG sympathetic shift + EMR medication interval" />
-          </div>
+          {phase === "recommendation" && !approved && (
+            <div className="mt-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-status-stable">
+              <Check className="h-3.5 w-3.5 shrink-0" />
+              <span className="truncate">
+                {`Safety check passed — RR ${safetyVitals.rr} · SpO₂ ${safetyVitals.spo2}% · 24h ${RECOMMENDATION.drug.toLowerCase()} ${SAFETY.fentanyl24h} ${RECOMMENDATION.unit}`}
+              </span>
+            </div>
+          )}
 
-          <button
-            type="button"
-            onClick={onApprove}
-            disabled={approvalState !== "ready"}
-            className={`mt-auto inline-flex h-12 items-center justify-center gap-2 rounded-md text-sm font-semibold transition ${
-              approvalState === "done"
-                ? "bg-status-stable text-white"
-                : approvalState === "loading"
-                  ? "bg-brand-panel text-white"
-                  : "bg-brand-navy text-white hover:bg-brand-panel"
-            }`}
-          >
-            {approvalState === "loading" && <Loader2 className="h-4 w-4 animate-spin" />}
-            {approvalState === "done" && <Check className="h-4 w-4" />}
-            {approvalState === "ready" && <Pill className="h-4 w-4" />}
-            {approvalState === "done" ? "Administration complete" : approvalState === "loading" ? "Approving order" : "Approve order"}
-          </button>
+          {showActions && (
+            <div className="mt-1.5 grid grid-cols-3 gap-2">
+              <ActionButton onClick={onDismiss} variant="ghost">Dismiss</ActionButton>
+              <ActionButton onClick={() => setDoseOpen(true)} variant="ghost">Modify</ActionButton>
+              <ActionButton onClick={onApprove} variant="primary">Approve</ActionButton>
+            </div>
+          )}
+
+          {approved && (
+            <div className="mt-1.5">
+              <div className="flex h-8 items-center justify-center gap-2 rounded-md bg-brand-navy text-xs font-semibold text-white">
+                {approvalState === "loading" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
+                {approvalState === "loading" ? "Approving order" : "Administration complete"}
+              </div>
+              {approvalState === "done" && <AuditTrail dose={dose} />}
+            </div>
+          )}
         </div>
       )}
+
+      {doseOpen && <DosePicker onSelect={chooseDose} onClose={() => setDoseOpen(false)} />}
     </section>
   );
 }
 
-function DecisionFact({ label, value, tone }) {
+function Headline({ phase, tone, recommendation, metrics }) {
+  const copy =
+    phase === "idle"
+      ? { Icon: Check, title: "Safe range", detail: "Maintain current analgesic plan" }
+      : phase === "warning"
+        ? { Icon: BrainCircuit, title: "Elevated risk under review", detail: "Recalculating treatment window" }
+        : phase === "administering"
+          ? { Icon: Loader2, title: "Order in progress", detail: metrics.aiStatus }
+          : phase === "recovered"
+            ? { Icon: Check, title: "Response confirmed", detail: metrics.aiStatus }
+            : { Icon: AlertTriangle, title: "Preemptive analgesic recommendation", detail: recommendation };
+
   return (
-    <div className={`rounded-md border bg-card-surface px-3 py-2 ${tone.border}`}>
-      <div className="text-[11px] uppercase tracking-[0.12em] text-text-label">{label}</div>
-      <div className="mt-1 text-text-primary">{value}</div>
+    <div className="flex items-center gap-2.5">
+      <span className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border bg-card-surface ${tone.border} ${tone.text}`}>
+        <copy.Icon className="h-4 w-4" />
+      </span>
+      <div className="min-w-0">
+        <div className={`truncate text-[11px] font-semibold uppercase tracking-[0.06em] ${tone.text}`}>{copy.title}</div>
+        <div className="truncate text-[15px] font-bold text-text-primary">{copy.detail}</div>
+      </div>
     </div>
   );
+}
+
+function Fact({ label, value, tone }) {
+  return (
+    <div className={`rounded-md border bg-card-surface px-2.5 py-1 ${tone.border}`}>
+      <div className="text-[10px] font-semibold uppercase tracking-[0.06em] text-text-label">{label}</div>
+      <div className="text-[13px] leading-snug text-text-primary">{value}</div>
+    </div>
+  );
+}
+
+function ActionButton({ children, onClick, variant }) {
+  const style =
+    variant === "primary"
+      ? "bg-brand-navy text-white hover:bg-brand-panel"
+      : "border border-hairline bg-card-surface text-text-label hover:border-brand-light hover:text-brand-panel";
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex h-10 items-center justify-center rounded-md text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel ${style}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+// 용량 선택 팝업 (PRD 5.6). 권고 헤드라인은 25 mcg로 고정하고 선택값은 감사추적·EMR에 반영된다.
+function DosePicker({ onSelect, onClose }) {
+  return (
+    <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/60 p-4" role="dialog" aria-modal="true" aria-label="Modify dose">
+      <div className="w-full rounded-lg border border-hairline bg-card-surface p-3 shadow-xl">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-semibold uppercase tracking-[0.06em] text-text-label">{`Modify dose (${RECOMMENDATION.unit})`}</span>
+          <button type="button" onClick={onClose} aria-label="Close dose picker" className="inline-flex h-8 w-8 items-center justify-center rounded-md text-text-label hover:bg-page-bg">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="mt-2 grid grid-cols-3 gap-2">
+          {DOSE_OPTIONS.map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => onSelect(option)}
+              className="inline-flex h-10 items-center justify-center rounded-md border border-hairline bg-page-bg text-sm font-bold tabular-nums text-text-primary transition hover:border-brand-panel hover:text-brand-panel focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel"
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 감사추적 — AI 권고값과 임상의 결정값을 함께 남긴다 (PRD 5.6)
+function AuditTrail({ dose }) {
+  const modified = dose !== RECOMMENDATION.dose;
+  const text = modified
+    ? `${AUDIT.approvedAt} · Approved by ${AUDIT.clinician} (ID ${AUDIT.clinicianId}) · Recommended ${RECOMMENDATION.dose} ${RECOMMENDATION.unit} · Administered ${dose} ${RECOMMENDATION.unit} (modified)`
+    : `${AUDIT.approvedAt} · Approved by ${AUDIT.clinician} (ID ${AUDIT.clinicianId}) · Sent to EMR — Ack ${AUDIT.ackAt}`;
+  return <div className="mt-1 truncate text-[10px] text-text-muted" title={text}>{text}</div>;
 }

@@ -11,11 +11,11 @@ export default function VitalsRail({ metrics }) {
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-px border-t border-monitor-grid bg-monitor-grid p-px sm:grid-cols-6 lg:block lg:border-l lg:border-t-0">
+    <div className="grid grid-cols-3 gap-px border-t border-monitor-grid bg-monitor-grid p-px sm:grid-cols-6 lg:grid lg:grid-cols-1 lg:grid-rows-6 lg:overflow-hidden lg:border-l lg:border-t-0">
       {vitals.map((item) => (
-        <div key={item.label} className="bg-monitor-bar px-3 py-2 lg:border-b lg:border-monitor-grid lg:py-3">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.12em] text-monitor-ink-dim">{item.label}</div>
-          <div className={`mt-1 text-xl font-bold tabular-nums lg:text-2xl ${item.color}`}>{item.value}</div>
+        <div key={item.label} className="flex min-h-0 items-baseline justify-between gap-2 bg-monitor-bar px-3 py-1 lg:px-2.5">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.06em] text-monitor-ink-dim">{item.label}</div>
+          <div className={`truncate text-base font-bold leading-tight tabular-nums ${item.color}`}>{item.value}</div>
         </div>
       ))}
     </div>

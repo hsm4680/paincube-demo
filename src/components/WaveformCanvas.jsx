@@ -168,13 +168,13 @@ export default function WaveformCanvas({ phase }) {
       ctx.fillRect(0, 0, width, height);
       ctx.strokeStyle = colors.grid;
       ctx.lineWidth = 1;
-      for (let x = 0; x < width; x += 44) {
+      for (let x = 0; x < width; x += 30) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, height);
         ctx.stroke();
       }
-      for (let y = 0; y < height; y += 38) {
+      for (let y = 0; y < height; y += 24) {
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(width, y);
@@ -193,14 +193,16 @@ export default function WaveformCanvas({ phase }) {
 
       ctx.fillStyle = colors.label;
       ctx.font = "600 10px ui-sans-serif, system-ui, sans-serif";
-      ctx.fillText(`${trace.label}_${trace.unit}`, 10, top + 18);
+      ctx.fillText(`${trace.label}_${trace.unit}`, 10, top + 12);
 
       const buffer = buffers.get(trace.key) || [];
+      // 샘플 진폭은 행 높이 124px 기준으로 튜닝돼 있다. 패널이 낮아지면 같은 비율로 줄인다.
+      const gain = Math.min(1, rowHeight / 124);
       const xStep = width / Math.max(1, buffer.length - 1);
       ctx.beginPath();
       for (let i = 0; i < buffer.length; i += 1) {
         const x = i * xStep;
-        const y = yBase + buffer[i];
+        const y = yBase + buffer[i] * gain;
         if (i === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       }
@@ -226,12 +228,14 @@ export default function WaveformCanvas({ phase }) {
 
     resize();
     render();
-    window.addEventListener("resize", resize);
+    // window resize만으로는 레이아웃 변화(패널 높이 변경)를 놓친다.
+    const observer = new ResizeObserver(() => resize());
+    observer.observe(canvas);
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener("resize", resize);
+      observer.disconnect();
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="h-[220px] w-full sm:h-[300px] lg:h-[372px]" />;
+  return <canvas ref={canvasRef} className="block h-full w-full" />;
 }
