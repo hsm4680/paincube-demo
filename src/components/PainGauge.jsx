@@ -1,5 +1,4 @@
 import React from "react";
-import { Gauge } from "lucide-react";
 import { STATUS_CLASS } from "./status.js";
 import { BASELINE_WINDOW_H, HORIZON_MIN, SCALE_MAX, THRESHOLD } from "../data/phases.js";
 
@@ -37,47 +36,47 @@ export default function PainGauge({ metrics }) {
   const breach = metrics.predicted >= THRESHOLD;
   const forecast = STATUS_CLASS[breach ? "status-critical" : "status-stable"];
   const forward = metrics.predicted >= metrics.painScore;
+  const quiet = metrics.status.color === "status-stable";
 
   return (
-    <section className="flex h-[160px] flex-col surface px-5 py-3">
-      <div className="flex items-center gap-2">
-        <div className="flex items-center gap-2 t-title">
-          <Gauge className="h-4 w-4 text-brand-light" />
-          Pain forecast
-        </div>
-      </div>
+    <section className="panel flex h-[160px] flex-col">
+      <div className="section-head">Pain forecast</div>
 
-      <div className="flex flex-1 items-center gap-4">
-        <div className="relative h-[120px] w-[120px] shrink-0">
+      <div className="flex flex-1 items-center gap-4 px-4">
+        <div className="relative h-[108px] w-[108px] shrink-0">
           <svg
             viewBox="0 0 120 120"
             role="img"
             aria-label={`Pain Score(CPI) ${metrics.painScore.toFixed(1)} of ${SCALE_MAX}, predicted ${metrics.predicted.toFixed(1)} in ${HORIZON_MIN} min`}
           >
-            <circle cx={CX} cy={CY} r={R} fill="none" className="stroke-hairline" strokeWidth="10" />
-            <path d={arc(0, metrics.painScore)} fill="none" className={status.stroke} strokeWidth="10" strokeLinecap="round" />
+            <circle cx={CX} cy={CY} r={R} fill="none" className="stroke-hairline" strokeWidth="9" />
+            <path
+              d={arc(0, metrics.painScore)}
+              fill="none"
+              className={quiet ? "stroke-chart-observed" : status.stroke}
+              strokeWidth="9"
+            />
             <path
               d={arc(metrics.painScore, metrics.predicted)}
               fill="none"
               className={forecast.stroke}
               strokeWidth="5"
               strokeDasharray="4 4"
-              strokeLinecap="round"
             />
             <polygon points={arrowHead(metrics.predicted, forward)} className={`${forecast.stroke} fill-current`} />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className="t-figure text-[30px] leading-none">{metrics.painScore.toFixed(1)}</div>
-            <div className="t-caption mt-1">{`/ ${SCALE_MAX}`}</div>
+            <div className="t-primary">{metrics.painScore.toFixed(1)}</div>
+            <div className="t-caption mt-0.5">{`/ ${SCALE_MAX}`}</div>
           </div>
         </div>
 
         <div className="min-w-0 flex-1">
           <div className="t-label">Pain Score(CPI)</div>
           <div className="t-value mt-0.5">{metrics.aiStatus}</div>
-          <div className="inset mt-3 px-3 py-2">
-            <div className="t-label">Personal baseline</div>
-            <div className="t-value">{`${BASELINE_WINDOW_H}h adaptive`}</div>
+          <div className="mt-3 flex items-baseline justify-between gap-2 border-t border-hairline pt-2">
+            <span className="t-label">Personal baseline</span>
+            <span className="t-value">{`${BASELINE_WINDOW_H}h adaptive`}</span>
           </div>
         </div>
       </div>

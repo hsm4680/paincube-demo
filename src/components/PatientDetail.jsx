@@ -11,21 +11,21 @@ import StatusBadge from "./StatusBadge.jsx";
 // 좌: 그래프 200 + 파형 225, 우: 게이지 160 + CDSS 265 — 두 열의 합을 같게 맞춘다.
 export default function PatientDetail({ phase, metrics, trend, approvalState, dose, onApprove, onDismiss, onModify, dismissed }) {
   return (
-    <div className="flex flex-1 flex-col gap-3">
-      <div className="flex h-24 flex-col gap-2">
-        <div className="flex h-[30px] items-center">
+    <div className="flex flex-1 flex-col gap-4">
+      <div className="flex h-24 flex-col gap-1.5">
+        <div className="flex h-[26px] items-center">
           <StatusBadge status={metrics.status} />
         </div>
         <KpiRow metrics={metrics} />
       </div>
 
-      <div className="grid gap-3 xl:grid-cols-[1.4fr_1fr]">
-        <div className="flex min-w-0 flex-col gap-3">
+      <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">
+        <div className="flex min-w-0 flex-col gap-4">
           <TrendChart trend={trend} metrics={metrics} />
           <MonitorPanel phase={phase} metrics={metrics} />
         </div>
 
-        <div className="flex min-w-0 flex-col gap-3">
+        <div className="flex min-w-0 flex-col gap-4">
           <PainGauge metrics={metrics} />
           <CdssPanel
             phase={phase}

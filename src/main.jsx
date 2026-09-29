@@ -107,7 +107,7 @@ function App() {
 
   return (
     <main className="min-h-screen bg-page-bg text-text-primary">
-      <div className="mx-auto flex min-h-screen max-w-[1760px] flex-col gap-3 px-3 py-3 sm:px-6">
+      <div className="mx-auto flex min-h-screen max-w-[1760px] flex-col gap-4 px-3 py-3 sm:px-6">
         <Header
           patient={onDetail ? patient : null}
           onStart={startDemo}
@@ -134,7 +134,7 @@ function App() {
       </div>
 
       {/* 우측 하단 고정 — 두 화면 모두 표시 (PRD 10.1) */}
-      <div className="pointer-events-none fixed bottom-2 right-3 z-40 text-[11px] font-medium text-text-muted">
+      <div className="pointer-events-none fixed bottom-2 right-3 z-40 t-caption">
         For investigational use only — not for clinical decision-making
       </div>
 

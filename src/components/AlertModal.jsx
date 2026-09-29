@@ -20,7 +20,7 @@ export default function AlertModal({ metrics, patient, rank, actionLabel, onActi
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4" role="dialog" aria-modal="true" aria-labelledby="pre-pain-alert-title">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} aria-hidden="true" />
 
-      <div className="relative w-[min(560px,100%)] rounded-[var(--radius-card)] bg-card-surface p-6 ring-2 ring-status-caution" style={{ boxShadow: "var(--shadow-modal)" }}>
+      <div className="relative w-[min(560px,100%)] rounded-[var(--radius-card)] border-2 border-status-caution bg-card-surface p-6">
         <button
           type="button"
           onClick={onClose}
@@ -46,7 +46,7 @@ export default function AlertModal({ metrics, patient, rank, actionLabel, onActi
           {`Pain Score predicted to exceed ${THRESHOLD.toFixed(1)} within ${HORIZON_MIN} minutes`}
         </p>
 
-        <div className="inset mt-5 flex items-center justify-between gap-4 px-4 py-3">
+        <div className="mt-5 flex items-center justify-between gap-4 border-y border-hairline py-3">
           <Figure label="Current" value={metrics.painScore.toFixed(1)} valueClass="text-text-primary" />
           <ArrowRight className="h-5 w-5 shrink-0 text-text-muted" aria-hidden="true" />
           <Figure label={`Predicted · ${HORIZON_MIN} min`} value={metrics.predicted.toFixed(1)} valueClass="text-status-critical" align="right" />

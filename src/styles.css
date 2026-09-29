@@ -62,16 +62,15 @@ button {
   font: inherit;
 }
 
-/* ── 11단계 시각 마감 토큰 ────────────────────────────────────────────────
+/* ── 시각 마감 토큰 ───────────────────────────────────────────────────
    색상은 여기서 정의하지 않는다. 위의 3계층 토큰이 유일한 출처다 (CLAUDE.md 4절).
-   여기는 반지름·그림자·타이포 스케일·여백 리듬만 다룬다. */
+   여기는 반지름·타이포 스케일·구조 표면만 다룬다.
+   레지스터: 임상 계측기 (UI_References/Ref_05 DeepCARS). 평평하고, 컨테이너가 적고,
+   표와 구분선으로 조직하며, 네이비가 구조를 만든다. */
 :root {
-  --radius-card: 10px;
-  --radius-control: 6px;
-
-  /* 그림자는 느껴질 정도로만. 오프셋 + 부드러운 블러 (glow 금지) */
-  --shadow-card: 0 1px 1px rgba(15, 23, 42, 0.03), 0 2px 6px rgba(15, 23, 42, 0.04);
-  --shadow-modal: 0 8px 16px rgba(15, 23, 42, 0.1), 0 24px 48px rgba(15, 23, 42, 0.14);
+  --radius-card: 4px;
+  --radius-control: 3px;
+  --section-head-h: 28px;
 }
 
 /* 브라우저 기본 표면도 팔레트를 따른다 */
@@ -89,60 +88,110 @@ button {
   scrollbar-width: thin;
 }
 
-/* ── 표면 ──────────────────────────────────────────────────────────────
-   카드는 테두리가 아니라 면과 여백으로 구분된다. hairline은 두 면이 여백 없이
-   맞닿는 자리에만 남긴다. */
-.surface {
-  background: var(--card-surface);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-}
+@layer components {
+  /* ── 표면 ──────────────────────────────────────────────────────────────
+     그림자를 쓰지 않는다. 1px hairline과 면만으로 영역을 만든다. */
+  .panel {
+    background: var(--card-surface);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+  }
 
-/* 면 위에 얹히는 내부 블록 — 테두리 대신 아주 옅은 바닥색으로 구분한다 */
-.inset {
-  background: var(--page-bg);
-  border-radius: var(--radius-control);
-}
+  /* 영역 제목 — 네이비 블록이 화면의 구조를 만든다 */
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: var(--section-head-h);
+    padding: 0 12px;
+    background: var(--brand-navy);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
 
-/* ── 타이포 스케일 4단계 ───────────────────────────────────────────────
-   제목 / 값 / 라벨 / 캡션. 크기·굵기·색이 함께 움직인다. */
-.t-title {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--brand-panel);
-}
+  /* 표 안의 라벨 열·라벨 행 — 두 번째 네이비 톤 */
+  .label-band {
+    background: var(--brand-panel);
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
 
-.t-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--text-label);
-}
+  /* 셀 구분은 세로선만 */
+  .rule-l {
+    border-left: 1px solid var(--hairline);
+  }
 
-.t-caption {
-  font-size: 10px;
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  color: var(--text-muted);
-}
+  /* ── 타이포 스케일 ─────────────────────────────────────────────────────
+     hero / primary / secondary / label / caption — 크기 차이를 4~5배로 벌린다. */
+  .t-hero {
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
 
-/* 값: 보조 수치 */
-.t-value {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-primary);
-  font-variant-numeric: tabular-nums;
-}
+  .t-primary {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
 
-/* 값: 주인공 수치. 보조 수치보다 확실히 무겁고 자간이 좁다 */
-.t-figure {
-  font-weight: 800;
-  letter-spacing: -0.025em;
-  color: var(--text-primary);
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "ss01";
+  .t-value {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .t-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0;
+    color: var(--text-label);
+  }
+
+  .t-caption {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--text-muted);
+  }
+
+  /* 단위는 값보다 확실히 작고 흐리다 */
+  .t-unit {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 상태 표기는 알약 모양을 쓰지 않는다 — 사각형 + 아이콘 + 텍스트 */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: var(--radius-control);
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
 }
 
 /* EMR 셀 강조 — 단계 전환과 함께 자동으로 켜진다 (PRD 5.7) */

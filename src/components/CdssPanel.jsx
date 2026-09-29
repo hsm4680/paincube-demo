@@ -13,6 +13,8 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
   const showActions = phase === "recommendation" && !dismissed && !approved;
   // 안전성 뱃지의 RR·SpO2는 recommendation 단계 vitals에서 읽는다 (PRD 5.6)
   const safetyVitals = PHASES.recommendation.vitals;
+  // 평상시에는 상태색을 쓰지 않는다 — 빨강이 떴을 때만 보이게 한다
+  const quiet = metrics.status.color === "status-stable";
 
   const chooseDose = (value) => {
     onModify(value);
@@ -21,48 +23,48 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
   };
 
   return (
-    <section className="relative flex h-[265px] flex-col surface px-5 py-3">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 t-title">
-          <FileCheck2 className="h-4 w-4 text-brand-light" />
+    <section className="panel relative flex h-[265px] flex-col">
+      <div className="section-head justify-between">
+        <span className="flex items-center gap-2">
+          <FileCheck2 className="h-3.5 w-3.5" />
           AI-CDSS
-        </div>
-        <ShieldCheck className="h-4 w-4 text-text-muted" />
+        </span>
+        <ShieldCheck className="h-3.5 w-3.5 text-white/55" />
       </div>
 
       {dismissed ? (
-        <div className="inset mt-2 flex flex-1 items-center justify-center px-4 text-sm font-semibold text-text-label">
+        <div className="flex flex-1 items-center justify-center px-4 text-[13px] font-semibold text-text-label">
           Recommendation dismissed
         </div>
       ) : (
-        <div className={`mt-2 flex flex-1 flex-col rounded-[var(--radius-card)] ${tone.tint} p-3`}>
-          <Headline phase={phase} tone={tone} recommendation={recommendation} metrics={metrics} />
+        <div className={`flex flex-1 flex-col p-3 ${quiet ? "" : tone.tint}`}>
+          <Headline phase={phase} tone={tone} quiet={quiet} recommendation={recommendation} metrics={metrics} />
 
           <div className="mt-2 grid flex-1 content-start gap-1.5">
             {phase === "idle" && (
               <>
-                <Fact tone={tone} label="Pain Score(CPI)" value={painFact} />
-                <Fact tone={tone} label="Time to Threshold" value={formatTimeToThreshold(metrics.timeToThreshold)} />
-                <Fact tone={tone} label="Recommendation" value="Continue monitoring; no opioid bolus indicated now" />
+                <Fact label="Pain Score(CPI)" value={painFact} />
+                <Fact label="Time to Threshold" value={formatTimeToThreshold(metrics.timeToThreshold)} />
+                <Fact label="Recommendation" value="Continue monitoring; no opioid bolus indicated now" />
               </>
             )}
             {phase === "warning" && (
               <>
-                <Fact tone={tone} label="Pain Score(CPI)" value={painFact} />
-                <Fact tone={tone} label="Signal change" value="EEG arousal burst + ECG rate variability + PPG amplitude shift" />
-                <Fact tone={tone} label="Next action" value="CDSS medication recommendation pending validation" />
+                <Fact label="Pain Score(CPI)" value={painFact} />
+                <Fact label="Signal change" value="EEG arousal burst + ECG rate variability + PPG amplitude shift" />
+                <Fact label="Next action" value="CDSS medication recommendation pending validation" />
               </>
             )}
             {(phase === "recommendation" || phase === "administering" || phase === "recovered") && (
               <>
-                <Fact tone={tone} label="Trigger" value={`Predicted Pain Score(CPI) ≥ ${THRESHOLD.toFixed(1)} within ${HORIZON_MIN} min`} />
-                <Fact tone={tone} label="Rationale" value="EEG arousal + ECG/PPG sympathetic shift + EMR medication interval" />
+                <Fact label="Trigger" value={`Predicted Pain Score(CPI) ≥ ${THRESHOLD.toFixed(1)} within ${HORIZON_MIN} min`} />
+                <Fact label="Rationale" value="EEG arousal + ECG/PPG sympathetic shift + EMR medication interval" />
               </>
             )}
           </div>
 
           {phase === "recommendation" && !approved && (
-            <div className="mt-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-status-stable">
+            <div className="mt-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-status-stable">
               <Check className="h-3.5 w-3.5 shrink-0" />
               <span className="truncate">
                 {`Safety check passed — RR ${safetyVitals.rr} · SpO₂ ${safetyVitals.spo2}% · 24h ${RECOMMENDATION.drug.toLowerCase()} ${SAFETY.fentanyl24h} ${RECOMMENDATION.unit}`}
@@ -71,7 +73,7 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
           )}
 
           {showActions && (
-            <div className="mt-1.5 grid grid-cols-3 gap-2">
+            <div className="mt-2 grid grid-cols-3 gap-1.5">
               <ActionButton onClick={onDismiss} variant="ghost">Dismiss</ActionButton>
               <ActionButton onClick={() => setDoseOpen(true)} variant="ghost">Modify</ActionButton>
               <ActionButton onClick={onApprove} variant="primary">Approve</ActionButton>
@@ -95,7 +97,7 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
   );
 }
 
-function Headline({ phase, tone, recommendation, metrics }) {
+function Headline({ phase, tone, quiet, recommendation, metrics }) {
   const copy =
     phase === "idle"
       ? { Icon: Check, title: "Safe range", detail: "Maintain current analgesic plan" }
@@ -109,22 +111,22 @@ function Headline({ phase, tone, recommendation, metrics }) {
 
   return (
     <div className="flex items-center gap-2.5">
-      <span className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-control)] bg-card-surface ${tone.text}`}>
+      <span className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-[var(--radius-control)] ${quiet ? "bg-page-bg text-text-label" : `bg-card-surface ${tone.text}`}`}>
         <copy.Icon className="h-4 w-4" />
       </span>
       <div className="min-w-0">
-        <div className={`truncate text-[11px] font-semibold uppercase tracking-[0.06em] ${tone.text}`}>{copy.title}</div>
-        <div className="truncate text-[15px] font-bold text-text-primary">{copy.detail}</div>
+        <div className={`truncate text-[10px] font-semibold uppercase tracking-[0.08em] ${quiet ? "text-text-label" : tone.text}`}>{copy.title}</div>
+        <div className="truncate text-[15px] font-bold tracking-[-0.01em] text-text-primary">{copy.detail}</div>
       </div>
     </div>
   );
 }
 
-function Fact({ label, value, tone }) {
+function Fact({ label, value }) {
   return (
-    <div className="rounded-[var(--radius-control)] bg-card-surface px-3 py-1.5">
-      <div className="t-label">{label}</div>
-      <div className="text-[13px] leading-snug text-text-primary">{value}</div>
+    <div className="border-t border-hairline pt-1">
+      <div className="t-caption uppercase tracking-[0.06em]">{label}</div>
+      <div className="t-value leading-snug">{value}</div>
     </div>
   );
 }
@@ -133,12 +135,12 @@ function ActionButton({ children, onClick, variant }) {
   const style =
     variant === "primary"
       ? "bg-brand-navy text-white hover:bg-brand-panel"
-      : "bg-card-surface text-text-label hover:text-brand-panel";
+      : "border border-hairline bg-card-surface text-text-label hover:text-brand-panel";
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex h-10 items-center justify-center rounded-[var(--radius-control)] text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel ${style}`}
+      className={`inline-flex h-9 items-center justify-center rounded-[var(--radius-control)] text-[13px] font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel ${style}`}
     >
       {children}
     </button>
@@ -149,7 +151,7 @@ function ActionButton({ children, onClick, variant }) {
 function DosePicker({ onSelect, onClose }) {
   return (
     <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/60 p-4" role="dialog" aria-modal="true" aria-label="Modify dose">
-      <div className="surface w-full p-3" style={{ boxShadow: "var(--shadow-modal)" }}>
+      <div className="panel w-full p-3">
         <div className="flex items-center justify-between">
           <span className="t-label">{`Modify dose (${RECOMMENDATION.unit})`}</span>
           <button type="button" onClick={onClose} aria-label="Close dose picker" className="inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-control)] text-text-label hover:bg-page-bg">

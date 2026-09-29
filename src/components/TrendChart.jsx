@@ -11,8 +11,8 @@ const TICK_MS = 1000; // 실제 1초
 const X_TICKS = [-60, -45, -30, -15, 0, 15];
 const Y_TICKS = [0, 2, 4, 6, 8, 10];
 // 카드 200px 예산 안에서의 본체 높이 (PRD 5.1). 파형 본체보다 작아지지 않는다.
-const PLOT_H = 140;
-const M = { top: 8, right: 52, bottom: 20, left: 36 };
+const PLOT_H = 130;
+const M = { top: 10, right: 50, bottom: 18, left: 30 };
 
 const clamp = (v) => Math.min(SCALE_MAX, Math.max(0, v));
 // 결정적 잡음 — 리셋할 때마다 같은 과거 곡선이 나온다.
@@ -137,13 +137,13 @@ export default function TrendChart({ trend, metrics }) {
   const ariaLabel = `Pain Score(CPI) trend, past ${PAST_MIN} min and ${HORIZON_MIN} min forecast. Current ${metrics.painScore.toFixed(1)} / ${SCALE_MAX}, predicted ${metrics.predicted.toFixed(1)} in ${HORIZON_MIN} min.`;
 
   return (
-    <section className="flex h-[200px] flex-col surface px-5 pb-2 pt-2">
-      <div className="flex items-center gap-2 t-title">
-        <LineChart className="h-4 w-4 text-brand-light" />
-        Pain Score(CPI) Trend &amp; Forecast
+    <section className="panel flex h-[200px] flex-col">
+      <div className="section-head">
+        <LineChart className="h-3.5 w-3.5" />
+        Pain Score(CPI) trend &amp; forecast
       </div>
 
-      <div ref={wrapRef} className="mt-0.5 w-full">
+      <div ref={wrapRef} className="w-full px-3">
         {width > 0 && (
           <svg width={width} height={H} role="img" aria-label={ariaLabel} className="block">
             <defs>

@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Database } from "lucide-react";
 import { formatAssessmentAge, lastAnalgesicFor } from "../data/phases.js";
 
 // 안전성 검증에 실제로 쓰인 항목 — recommendation 단계에서 자동 강조된다 (PRD 5.7)
 const SAFETY_KEYS = ["lastAnalgesic", "activeMeds", "renal"];
+
+// 박스 6개가 아니라 표다 (Ref_05). 라벨 행은 네이비, 셀 구분은 세로선만.
+// 열 폭은 값 길이에 맞춘다 — Active medication이 넘치지 않는다.
+const COLUMNS = "1fr 1fr 1.25fr 1.7fr 1.3fr 0.7fr";
 
 export default function EmrPanel({ phase, metrics, dose }) {
   const [justWritten, setJustWritten] = useState(false);
@@ -28,22 +31,20 @@ export default function EmrPanel({ phase, metrics, dose }) {
   const safetyActive = phase === "recommendation";
 
   return (
-    <section className="flex h-24 flex-col surface px-4 py-2">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 t-title">
-          <Database className="h-3.5 w-3.5 text-brand-light" />
-          EMR context — inputs to prediction and safety check
-        </div>
-        <span className="inset hidden whitespace-nowrap px-2 py-0.5 t-caption lg:inline">
+    <section className="panel flex h-24 flex-col">
+      <div className="section-head justify-between">
+        <span>EMR context — inputs to prediction and safety check</span>
+        <span className="hidden text-[9px] font-medium normal-case tracking-[0.04em] text-white/55 lg:inline">
           HL7 FHIR R4 · Epic / Cerner compatible
         </span>
       </div>
 
-      <div className="mt-1.5 grid flex-1 grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-6">
-        {items.map((item) => (
-          <EmrFact
+      <div className="grid flex-1 grid-cols-2 sm:grid-cols-3 lg:grid-cols-[var(--emr-cols)]" style={{ "--emr-cols": COLUMNS }}>
+        {items.map((item, index) => (
+          <EmrCell
             key={item.key}
             {...item}
+            divided={index > 0}
             highlighted={(safetyActive && SAFETY_KEYS.includes(item.key)) || (justWritten && item.key === "lastAnalgesic")}
           />
         ))}
@@ -52,18 +53,16 @@ export default function EmrPanel({ phase, metrics, dose }) {
   );
 }
 
-function EmrFact({ label, value, role, highlighted }) {
+function EmrCell({ label, value, role, divided, highlighted }) {
   return (
-    <div
-      className={`emr-cell inset flex min-w-0 flex-col px-2.5 py-1.5 ${
-        highlighted ? "bg-status-caution-tint ring-1 ring-status-caution" : ""
-      }`}
-    >
-      <div className="t-label truncate">{label}</div>
-      <div className="line-clamp-2 text-[12px] font-semibold leading-tight text-text-primary" title={value}>
-        {value}
+    <div className={`emr-cell flex min-w-0 flex-col ${divided ? "rule-l" : ""}`}>
+      <div className="label-band truncate px-2 py-[3px]">{label}</div>
+      <div className={`flex min-w-0 flex-1 flex-col justify-center px-2 ${highlighted ? "bg-status-caution-tint" : ""}`}>
+        <div className={`t-value truncate ${highlighted ? "text-status-caution" : ""}`} title={value}>
+          {value}
+        </div>
+        <div className="t-caption truncate">{role}</div>
       </div>
-      <div className="t-caption mt-auto truncate">{role}</div>
     </div>
   );
 }
