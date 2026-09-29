@@ -18,10 +18,10 @@ export default function KpiRow({ metrics }) {
 
 function Kpi({ label, value, suffix, valueClass = "text-text-primary", small = false }) {
   return (
-    <div className="flex min-w-0 items-center justify-between gap-3 rounded-lg border border-hairline bg-card-surface px-4 shadow-sm">
-      <span className="text-xs font-semibold uppercase tracking-[0.06em] text-text-label">{label}</span>
+    <div className="flex min-w-0 flex-col justify-center rounded-lg border border-hairline bg-card-surface px-4 shadow-sm">
+      <span className="truncate text-[11px] font-semibold uppercase tracking-[0.06em] text-text-label">{label}</span>
       <span className="flex items-baseline gap-1 whitespace-nowrap">
-        <span className={`${small ? "text-xl" : "text-3xl"} font-bold tabular-nums ${valueClass}`}>{value}</span>
+        <span className={`${small ? "text-xl" : "text-2xl"} font-bold leading-tight tabular-nums ${valueClass}`}>{value}</span>
         {suffix && <span className="text-sm font-semibold text-text-label">{suffix}</span>}
       </span>
     </div>

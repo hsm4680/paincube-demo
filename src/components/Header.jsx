@@ -2,6 +2,7 @@ import React from "react";
 import { ArrowLeft, BrainCircuit, Circle, Play, RefreshCw } from "lucide-react";
 import paincubeLogo from "../assets/paincube-logo.png";
 import { WARD, bedLabel, contextLine, patientIdLabel, profileLabel } from "../data/patients.js";
+import { HORIZON_MIN } from "../data/phases.js";
 
 // patient가 없으면 Ward Dashboard 헤더, 있으면 Patient Detail 헤더다. 높이 84px (PRD 5.1 예산).
 export default function Header({ patient, onStart, onReset, onBack, demoRunning }) {
@@ -36,11 +37,17 @@ export default function Header({ patient, onStart, onReset, onBack, demoRunning 
             <BrainCircuit className="h-4 w-4 text-brand-light" />
             Predictive Pain AI
           </div>
-          <h1 className="mt-1 truncate text-xl font-bold text-brand-navy">{`${WARD.name} · ${WARD.beds} beds`}</h1>
+          <h1 className="mt-1 truncate text-xl font-bold text-brand-navy">{`${WARD.name} \u00b7 ${WARD.beds} beds`}</h1>
         </div>
       )}
 
-      <div className="ml-auto flex shrink-0 items-center gap-2">
+      {!patient && (
+        <span className="ml-auto hidden text-xs font-medium text-text-label lg:inline">
+          {`sorted by predicted Pain Score (${HORIZON_MIN} min)`}
+        </span>
+      )}
+
+      <div className={`flex shrink-0 items-center gap-2 ${patient ? "ml-auto" : "ml-4"}`}>
         <button
           type="button"
           onClick={onStart}

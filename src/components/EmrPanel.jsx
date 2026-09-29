@@ -55,7 +55,7 @@ export default function EmrPanel({ phase, metrics, dose }) {
 function EmrFact({ label, value, role, highlighted }) {
   return (
     <div
-      className={`emr-cell min-w-0 rounded-md border px-2 py-1 ${
+      className={`emr-cell flex min-w-0 flex-col rounded-md border px-2 py-1 ${
         highlighted ? "border-status-caution bg-status-caution-tint" : "border-hairline bg-page-bg"
       }`}
     >
@@ -63,7 +63,7 @@ function EmrFact({ label, value, role, highlighted }) {
       <div className="line-clamp-2 text-[12px] font-semibold leading-tight text-text-primary" title={value}>
         {value}
       </div>
-      <div className="truncate text-[10px] text-text-muted">{role}</div>
+      <div className="mt-auto truncate text-[10px] text-text-muted">{role}</div>
     </div>
   );
 }

@@ -8,7 +8,7 @@ import KpiRow from "./KpiRow.jsx";
 import StatusBadge from "./StatusBadge.jsx";
 
 // 높이 예산 (PRD 5.1): 상태어+KPI 96 / 좌우 각 425 / EMR 96.
-// 좌: 그래프 200 + 파형 225, 우: 게이지 180 + CDSS 245 — 두 열의 합을 같게 맞춘다.
+// 좌: 그래프 200 + 파형 225, 우: 게이지 160 + CDSS 265 — 두 열의 합을 같게 맞춘다.
 export default function PatientDetail({ phase, metrics, trend, approvalState, dose, onApprove, onDismiss, onModify, dismissed }) {
   return (
     <div className="flex flex-1 flex-col gap-3">

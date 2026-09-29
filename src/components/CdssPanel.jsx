@@ -3,7 +3,7 @@ import { AlertTriangle, BrainCircuit, Check, FileCheck2, Loader2, ShieldCheck, X
 import { STATUS_CLASS } from "./status.js";
 import { AUDIT, DOSE_OPTIONS, HORIZON_MIN, PHASES, RECOMMENDATION, SAFETY, SCALE_MAX, THRESHOLD, formatTimeToThreshold } from "../data/phases.js";
 
-// AI-CDSS 카드 245px (PRD 5.1 예산 / 5.6 사양). 모든 수치는 PHASES·RECOMMENDATION에서 읽는다.
+// AI-CDSS 카드 265px (게이지 160 + CDSS 265 = 좌측 열과 같은 425). 모든 수치는 PHASES·RECOMMENDATION에서 읽는다.
 export default function CdssPanel({ phase, metrics, approvalState, dose, dismissed, onApprove, onDismiss, onModify }) {
   const [doseOpen, setDoseOpen] = useState(false);
   const tone = STATUS_CLASS[metrics.status.color];
@@ -21,7 +21,7 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
   };
 
   return (
-    <section className="relative flex h-[245px] flex-col rounded-lg border border-hairline bg-card-surface px-5 py-3 shadow-sm">
+    <section className="relative flex h-[265px] flex-col rounded-lg border border-hairline bg-card-surface px-5 py-3 shadow-sm">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.06em] text-brand-panel">
           <FileCheck2 className="h-4 w-4 text-brand-light" />
