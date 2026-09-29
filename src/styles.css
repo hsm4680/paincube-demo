@@ -62,6 +62,21 @@ button {
   font: inherit;
 }
 
+/* 카드 재정렬 — 순간이동하지 않고 미끄러지게 한다 (PRD 4.3) */
+.ward-card {
+  transition: transform 620ms cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ward-card {
+    transition: none;
+  }
+  .animate-spin-slow {
+    animation: none;
+  }
+}
+
 .animate-spin-slow {
   animation: spin 2.4s linear infinite;
 }
