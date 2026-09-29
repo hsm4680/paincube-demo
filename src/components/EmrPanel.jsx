@@ -19,7 +19,7 @@ export default function EmrPanel({ phase, metrics, dose }) {
   const items = [
     { key: "procedure", label: "Procedure", value: metrics.emr.procedure, role: "prediction context" },
     { key: "painAssessment", label: "Pain assessment", value: formatAssessmentAge(metrics.emr.painAssessment), role: "last nurse observation" },
-    { key: "lastAnalgesic", label: "Last analgesic", value: lastAnalgesicFor(phase, dose), role: "safety check" },
+    { key: "lastAnalgesic", label: "Last analgesic", value: lastAnalgesicFor(phase, dose, metrics.emr.lastAnalgesic), role: "safety check" },
     { key: "activeMeds", label: "Active medication", value: metrics.emr.activeMeds, role: "safety check" },
     { key: "sedation", label: "Sedation", value: metrics.emr.sedation, role: "prediction input" },
     { key: "renal", label: "Renal function", value: metrics.emr.renal, role: "dose adjustment" }

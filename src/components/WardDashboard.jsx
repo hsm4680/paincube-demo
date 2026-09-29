@@ -5,8 +5,8 @@ import { STATUS } from "../data/phases.js";
 
 const GAP = 16; // px, 카드 간격
 // 데스크톱(3열): 헤더 85 + 페이지 패딩 32 + 섹션 간격 16 = 133px를 뺀 높이를 쓰되
-// 카드가 과하게 늘어나지 않도록 656px(카드 320px × 2행)에서 멈춘다. 1440x900 무스크롤.
-const GRID_H = "min(calc(100vh - 133px), 640px)";
+// 카드가 과하게 늘어나지 않도록 700px(카드 342px × 2행)에서 멈추고 남는 높이는 위아래로 나눈다.
+const GRID_H = "min(calc(100vh - 133px), 700px)";
 const CARD_H_SM = 200; // px, 2열·1열에서는 고정 높이 + 페이지 스크롤
 
 // 카드 폭 = 열 폭이므로 translate의 100%는 한 칸 이동과 같다.
@@ -89,7 +89,7 @@ export default function WardDashboard({ heroMetrics, onOpenPatient, resetKey }) 
               predicted={card.predicted}
               status={card.status}
               rank={index + 1}
-              onOpen={card.patient.bed === HERO_BED ? onOpenPatient : undefined}
+              onOpen={() => onOpenPatient(card.patient.bed)}
             />
           </div>
         );

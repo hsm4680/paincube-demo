@@ -31,7 +31,7 @@ function MonitorBar({ metrics }) {
     <div className="grid h-[56px] shrink-0 grid-cols-2 border-b border-monitor-grid bg-monitor-bar text-monitor-ink sm:grid-cols-[96px_96px_136px_minmax(160px,1fr)]">
       <MonitorMetric label="Pain score" value={metrics.painScore.toFixed(1)} />
       <MonitorMetric label={`PRED_${HORIZON_MIN}M`} value={metrics.predicted.toFixed(1)} alert={metrics.predicted >= THRESHOLD} />
-      <MonitorMetric label="Time to threshold" value={formatTimeToThresholdShort(metrics.timeToThreshold)} />
+      <MonitorMetric label="To threshold" value={formatTimeToThresholdShort(metrics.timeToThreshold)} />
       <MonitorMetric label="AI status" value={metrics.aiStatus} wide />
     </div>
   );

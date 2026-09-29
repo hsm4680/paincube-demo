@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { PHASES, RECOMMENDATION } from "./data/phases.js";
+import { PHASES, RECOMMENDATION, metricsForPatient } from "./data/phases.js";
 import { PATIENTS, HERO_BED } from "./data/patients.js";
 import Header from "./components/Header.jsx";
 import WardDashboard from "./components/WardDashboard.jsx";
@@ -11,6 +11,7 @@ import "./styles.css";
 
 function App() {
   const [screen, setScreen] = useState("ward"); // "ward" | "detail" — react-router 없이 상태로 전환한다
+  const [selectedBed, setSelectedBed] = useState(HERO_BED);
   const [phase, setPhase] = useState("idle");
   const [modalOpen, setModalOpen] = useState(false);
   const [demoRunning, setDemoRunning] = useState(false);
@@ -19,9 +20,15 @@ function App() {
   const [dose, setDose] = useState(RECOMMENDATION.dose); // Modify로 바꾼 용량 (PRD 5.6)
   const [dismissed, setDismissed] = useState(false);
   const timers = useRef([]);
-  const metrics = PHASES[phase];
-  const patient = PATIENTS.find((p) => p.bed === HERO_BED);
-  const trend = usePainTrend(metrics.painScore, resetKey);
+  const heroMetrics = PHASES[phase];
+  const hero = PATIENTS.find((p) => p.bed === HERO_BED);
+  const patient = PATIENTS.find((p) => p.bed === selectedBed);
+  const onHero = selectedBed === HERO_BED;
+  const metrics = onHero ? heroMetrics : metricsForPatient(patient);
+  // 주인공 추세는 화면 전환에도 이어진다. 다른 환자는 각자의 기준선으로 따로 흐른다.
+  const heroTrend = usePainTrend(heroMetrics.painScore, resetKey);
+  const otherTrend = usePainTrend(metrics.painScore, `${resetKey}:${selectedBed}`);
+  const trend = onHero ? heroTrend : otherTrend;
 
   const clearTimers = () => {
     timers.current.forEach(clearTimeout);
@@ -36,6 +43,7 @@ function App() {
   const handleReset = () => {
     clearTimers();
     setScreen("ward");
+    setSelectedBed(HERO_BED);
     setPhase("idle");
     setModalOpen(false);
     setDemoRunning(false);
@@ -59,21 +67,24 @@ function App() {
     schedule(() => setModalOpen(true), 3500);
   };
 
-  const openPatient = () => {
+  const openPatient = (bed = HERO_BED) => {
+    setSelectedBed(bed);
     setScreen("detail");
-    if (phase === "warning") setModalOpen(true); // 진입 즉시 동일 모달 재표시 (PRD 7)
+    // 주인공 화면에 들어갈 때만 동일 모달을 재표시한다 (PRD 7)
+    if (bed === HERO_BED && phase === "warning") setModalOpen(true);
+    else if (bed !== HERO_BED) setModalOpen(false);
   };
 
   // 타이머 기준점은 "모달을 닫는 시점"이다 (PRD 7)
   const closeModal = () => {
     setModalOpen(false);
-    if (screen === "detail" && phase === "warning") {
+    if (screen === "detail" && onHero && phase === "warning") {
       schedule(() => setPhase("recommendation"), 2000);
     }
   };
 
   const approveOrder = () => {
-    if (approvalState !== "ready") return;
+    if (approvalState !== "ready" || !onHero) return;
     setApprovalState("loading");
     setPhase("administering");
     schedule(() => {
@@ -100,7 +111,7 @@ function App() {
 
         {onDetail ? (
           <PatientDetail
-            phase={phase}
+            phase={onHero ? phase : "idle"}
             metrics={metrics}
             trend={trend}
             approvalState={approvalState}
@@ -111,7 +122,7 @@ function App() {
             onModify={setDose}
           />
         ) : (
-          <WardDashboard heroMetrics={metrics} onOpenPatient={openPatient} resetKey={resetKey} />
+          <WardDashboard heroMetrics={heroMetrics} onOpenPatient={openPatient} resetKey={resetKey} />
         )}
       </div>
 
@@ -122,10 +133,10 @@ function App() {
 
       {modalOpen && (
         <AlertModal
-          metrics={metrics}
-          patient={patient}
-          actionLabel={onDetail ? "Continue" : "View patient"}
-          onAction={onDetail ? closeModal : openPatient}
+          metrics={heroMetrics}
+          patient={hero}
+          actionLabel={onDetail && onHero ? "Continue" : "View patient"}
+          onAction={onDetail && onHero ? closeModal : () => openPatient(HERO_BED)}
           onClose={closeModal}
         />
       )}

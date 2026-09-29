@@ -237,5 +237,5 @@ export default function WaveformCanvas({ phase }) {
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="block h-full w-full" />;
+  return <canvas ref={canvasRef} role="img" aria-label="Live EEG, ECG and PPG waveforms" className="block h-full w-full" />;
 }

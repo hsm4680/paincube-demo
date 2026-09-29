@@ -29,7 +29,7 @@ export default function Header({ patient, onStart, onReset, onBack, demoRunning 
             </div>
             <div className="truncate text-sm text-text-label">{contextLine(patient)}</div>
           </div>
-          <NrsBadge />
+          {patient.selfReport === false && <NrsBadge />}
         </div>
       ) : (
         <div className="min-w-0 border-l border-hairline pl-4">

@@ -80,7 +80,7 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
 
           {approved && (
             <div className="mt-1.5">
-              <div className="flex h-8 items-center justify-center gap-2 rounded-md bg-brand-navy text-xs font-semibold text-white">
+              <div className="flex h-8 items-center justify-center gap-2 rounded-md bg-brand-navy text-xs font-semibold text-white" role="status" aria-live="polite" aria-busy={approvalState === "loading"}>
                 {approvalState === "loading" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
                 {approvalState === "loading" ? "Approving order" : "Administration complete"}
               </div>

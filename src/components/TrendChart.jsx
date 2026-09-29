@@ -15,8 +15,10 @@ const PLOT_H = 140;
 const M = { top: 8, right: 52, bottom: 20, left: 36 };
 
 const clamp = (v) => Math.min(SCALE_MAX, Math.max(0, v));
-// 결정적 잡음 — 리셋할 때마다 같은 과거 곡선이 나온다
-const jitter = (m) => 0.07 * Math.sin(m * 1.73) + 0.04 * Math.sin(m * 0.41 + 1.2);
+// 결정적 잡음 — 리셋할 때마다 같은 과거 곡선이 나온다.
+// 진폭 ±0.3: 직선이면 "데이터 없음"으로 읽힌다. 살아있는 신호로 보여야 한다.
+const jitter = (m) =>
+  0.15 * Math.sin(m * 1.73) + 0.09 * Math.sin(m * 0.41 + 1.2) + 0.06 * Math.sin(m * 3.11 + 0.4);
 
 // 한 차트-분 진행: 현재 단계 Pain Score로 수렴 (warning 진입 시점부터 상승이 시작된다)
 const stepToward = (v, target, m) => clamp(v + (target - v) * 0.45 + jitter(m) * 0.6);
@@ -149,9 +151,6 @@ export default function TrendChart({ trend, metrics }) {
                 <rect x={M.left} y={0} width={plotW} height={H} />
               </clipPath>
             </defs>
-
-            {/* 예측 구간 배경 — 구조 표시용 */}
-            <rect x={xNow} y={M.top} width={HORIZON_MIN * ppm} height={PLOT_H} className="fill-page-bg" />
 
             {Y_TICKS.map((v) => (
               <g key={`y${v}`}>

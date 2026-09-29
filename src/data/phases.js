@@ -83,6 +83,22 @@ export const PHASES = {
   }
 };
 
+// Bed 03 외 환자의 상세 화면 — idle 단계에 각자의 값·EMR·vitals를 얹는다 (PRD 4.4)
+export const metricsForPatient = (patient) => ({
+  ...PHASES.idle,
+  painScore: patient.painScore,
+  predicted: patient.predicted,
+  vitals: patient.vitals,
+  emr: {
+    procedure: patient.procedure,
+    painAssessment: patient.emr.assessmentAt,
+    lastAnalgesic: patient.emr.lastAnalgesic,
+    activeMeds: patient.emr.activeMeds,
+    sedation: patient.emr.sedation,
+    renal: patient.emr.renal
+  }
+});
+
 // 권고 약물 — 이 하나만 쓴다 (CLAUDE.md 10절)
 export const RECOMMENDATION = {
   drug: "Fentanyl",
@@ -108,10 +124,10 @@ export const AUDIT = {
 };
 
 // 승인 용량을 수정한 경우 투여 후 단계의 Last analgesic에 그 용량이 반영된다 (PRD 5.7)
-export const lastAnalgesicFor = (phase, dose = RECOMMENDATION.dose) => {
+export const lastAnalgesicFor = (phase, dose, current) => {
   if (phase === "administering") return `${RECOMMENDATION.drug} ${dose} ${RECOMMENDATION.unit} IV, now`;
   if (phase === "recovered") return `${RECOMMENDATION.drug} ${dose} ${RECOMMENDATION.unit} IV, 1 min ago`;
-  return PHASES[phase].emr.lastAnalgesic;
+  return current;
 };
 
 export const formatTimeToThreshold = (minutes) =>
