@@ -138,6 +138,43 @@ button {
     border-left: 1px solid var(--hairline);
   }
 
+  /* 상세 화면의 주인공 숫자도 같은 원리로 컨테이너 폭에 연동한다 */
+  .kpi-cell {
+    container-type: inline-size;
+  }
+
+  .kpi-value {
+    font-size: clamp(30px, 11cqw, 60px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .kpi-value-sm {
+    font-size: clamp(16px, 5.4cqw, 26px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .gauge-box {
+    container-type: inline-size;
+  }
+
+  .gauge-dial {
+    width: clamp(96px, 34cqw, 168px);
+  }
+
+  .gauge-value {
+    font-size: clamp(24px, 9cqw, 44px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
   /* 칸 수는 고정하지 않는다 — 각 칸의 최소 폭을 정하고 못 맞추면 접힌다 */
   .kpi-grid {
     display: grid;
@@ -146,7 +183,12 @@ button {
 
   .monitor-bar-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+
+  /* AI status는 문장이라 두 칸을 쓴다. 칸이 하나뿐인 폭에서는 자동으로 한 칸이 된다. */
+  .bar-wide {
+    grid-column: span 2;
   }
 
   .emr-grid {
@@ -166,6 +208,99 @@ button {
   .emr-referenced {
     background: color-mix(in srgb, var(--brand-navy) 7%, var(--card-surface));
     box-shadow: inset 2px 0 0 0 var(--brand-navy);
+  }
+
+  /* ── 카드 내부 타이포·막대 — 컨테이너 폭에 연동한다 ────────────────────
+     고정 px을 쓰면 3열 PC(카드 ~640px)와 2열 태블릿(~350px)에서 숫자의
+     상대 비율이 무너진다. cqw로 묶어 카드 폭 대비 같은 비율로 보이게 한다. */
+  .patient-card {
+    container-type: inline-size;
+  }
+
+  .card-value {
+    font-size: clamp(34px, 9.6cqw, 78px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .card-unit {
+    font-size: clamp(11px, 2.6cqw, 20px);
+    font-weight: 600;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .card-label {
+    font-size: clamp(9px, 1.9cqw, 14px);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-label);
+  }
+
+  .card-arrow {
+    width: clamp(16px, 3.4cqw, 30px);
+    height: clamp(16px, 3.4cqw, 30px);
+    color: var(--text-muted);
+  }
+
+  .card-scale {
+    font-size: clamp(9px, 1.7cqw, 13px);
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted);
+  }
+
+  /* 막대: 빈 트랙 + 채움 + 핸들 3종 조합이 슬라이더로 읽히게 만든다.
+     핸들을 쓰지 않고 채움과 연장 구간만 그려 차트로 읽히게 한다. */
+  .card-bar {
+    position: relative;
+    height: clamp(8px, 1.9cqw, 16px);
+    background: var(--page-bg);
+  }
+
+  .bar-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: var(--chart-observed);
+  }
+
+  .bar-fill-breach {
+    background: var(--status-critical);
+  }
+
+  /* 연장 구간 — 예측이 향하는 방향. 빗금으로 "아직 오지 않은 값"임을 말한다. */
+  .bar-extend {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background-image: repeating-linear-gradient(
+      135deg,
+      var(--text-muted) 0 2px,
+      transparent 2px 6px
+    );
+    border: 1px solid var(--text-muted);
+  }
+
+  .bar-extend-breach {
+    background-image: repeating-linear-gradient(
+      135deg,
+      var(--status-critical) 0 2px,
+      transparent 2px 6px
+    );
+    border-color: var(--status-critical);
+  }
+
+  /* 목표선 — 막대 위아래로 조금 튀어나온다 */
+  .bar-target {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    width: 2px;
+    transform: translateX(-50%);
+    background: var(--text-primary);
   }
 
   /* 눈금자 축 — hairline보다 살짝 진한 중성색. 채움을 쓰지 않는다 (Ref_05). */

@@ -4,7 +4,7 @@ import { BASELINE_WINDOW_H, HORIZON_MIN, SCALE_MAX, THRESHOLD } from "../data/ph
 // 게이지 카드 160px. Predicted / Time to Threshold 줄과 상태 배지는 KPI·상태어와 중복이라 뺐다.
 // 링 구조 (PRD 5.5): 현재값은 실선 호, 현재값 끝점에서 예측값까지는 점선 확장 호 + 화살표.
 // 두 호를 이어 그린다. v1처럼 같은 반지름에 겹쳐 그려 덮이게 하지 않는다.
-// 색 판정은 막대와 같은 규칙이다 — 임계 5.0 하나로만 갈라지고, 실선 호는 현재값,
+// 색 판정은 막대와 같은 규칙이다 — 목표값 4.0 하나로만 갈라지고, 실선 호는 현재값,
 // 점선 호는 예측값으로 판정한다. 화면 단계 상태는 상태어 배지가 이미 전달한다.
 const CX = 60;
 const CY = 60;
@@ -41,8 +41,8 @@ export default function PainGauge({ metrics }) {
     <section className="panel flex min-h-[160px] shrink-0 flex-col">
       <div className="section-head">Pain forecast</div>
 
-      <div className="flex flex-1 items-center gap-4 px-4">
-        <div className="relative h-[108px] w-[108px] shrink-0">
+      <div className="gauge-box flex flex-1 items-center gap-4 px-4">
+        <div className="gauge-dial relative aspect-square shrink-0">
           <svg
             viewBox="0 0 120 120"
             role="img"
@@ -60,7 +60,7 @@ export default function PainGauge({ metrics }) {
             <polygon points={arrowHead(metrics.predicted, forward)} className={`${forecastStroke} fill-current`} />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className="t-primary">{metrics.painScore.toFixed(1)}</div>
+            <div className="gauge-value">{metrics.painScore.toFixed(1)}</div>
             <div className="t-caption mt-0.5">{`/ ${SCALE_MAX}`}</div>
           </div>
         </div>
@@ -68,7 +68,11 @@ export default function PainGauge({ metrics }) {
         <div className="min-w-0 flex-1">
           <div className="t-label">Pain Score(CPI)</div>
           <div className="t-value mt-0.5">{metrics.aiStatus}</div>
-          <div className="mt-3 flex items-baseline justify-between gap-2 border-t border-hairline pt-2">
+          <div className="mt-2 flex items-baseline justify-between gap-2 border-t border-hairline pt-1.5">
+            <span className="t-label">Target</span>
+            <span className="t-value">{`Pain Score < ${THRESHOLD.toFixed(1)}`}</span>
+          </div>
+          <div className="mt-1 flex items-baseline justify-between gap-2 border-t border-hairline pt-1.5">
             <span className="t-label">Personal baseline</span>
             <span className="t-value">{`${BASELINE_WINDOW_H}h adaptive`}</span>
           </div>

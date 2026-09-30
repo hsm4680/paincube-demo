@@ -32,10 +32,12 @@
 | `PAIN SCORE` (좁은 공간) | `Calculated Pain Index` |
 | `PRED_15M` / `Predicted · 15 min` | `PRED_30M`, `predicted in 30 min` |
 | `Time to Threshold` | `RISK %`, `Pain probability`, `probability of severe pain` |
-| `Threshold 5.0` | `7.0` |
+| `Threshold 4.0` | `5.0`, `7.0` |
 
 - **예측 지평은 15분이다.** 30분 표기가 남아 있으면 안 된다.
-- **임계값은 5.0이다.** 7.0이 남아 있으면 안 된다.
+- **임계값(통증 관리 목표)은 4.0이다.** 5.0·7.0이 남아 있으면 안 된다.
+  0–10 척도에서 4점이 "임상적으로 유의미한 통증"의 표준 컷오프이고,
+  ICU 통증 관리 프로토콜은 Pain Score < 4 유지를 목표로 잡는다.
 - **확률(probability) 지표는 이 제품 화면에 존재하지 않는다.** 되살리지 않는다.
 
 ---
@@ -108,14 +110,14 @@
 - **상태를 색상만으로 전달하지 말 것.** 항상 아이콘 + 텍스트를 함께 둔다.
 - **상태어에 색은 `ACTION REQUIRED`에만 붙인다.** `STABLE` / `RISING` / `TREATING` /
   `STABILIZED`는 중성 회색이다(PRD 2.5). 전체 흐름에서 빨강이 권고 시점에 한 번만 떠야 한다.
-- **현재값·예측값을 그리는 요소의 색은 임계 5.0 하나로만 갈라진다**(PRD 5.4-1).
-  5.0 미만은 중성 회색, 이상은 `--status-critical`. 4.0 근접 caution은 색으로 표현하지 않는다.
+- **현재값·예측값을 그리는 요소의 색은 목표값 4.0 하나로만 갈라진다**(PRD 5.4-1).
+  4.0 미만은 중성 회색, 이상은 `--status-critical`. 근접 구간을 별도 색으로 칠하지 않는다.
 
 ### 예측선 색상만 예외적으로 동적이다
 
 추세 그래프의 미래 구간 점선은 도달할 상태의 색을 따른다.
-- 예측 < 5.0 → `--status-stable`
-- 예측 ≥ 5.0 → `--status-critical`
+- 예측 < 4.0 → `--status-stable`
+- 예측 ≥ 4.0 → `--status-critical`
 
 ---
 
@@ -179,7 +181,7 @@
   RASS −2는 자가보고와 CPOT 평가가 가능한 구간이라 `Unable to self-report`와 모순된다.
 - 주인공 환자는 **CABG, POD 0**이다.
 - 약물 권고는 `Fentanyl 25 mcg IV Bolus` 하나만 쓴다. 다른 약물·용량을 임의로 추가하지 않는다.
-- 안전성 뱃지의 수치(RR, SpO₂, 누적 fentanyl)는 해당 단계의 vitals와 일치해야 한다.
+- 안전성 뱃지의 수치(RR, SpO₂, 마지막 오피오이드 이후 경과)는 해당 단계의 vitals와 일치해야 한다.
 
 ---
 
@@ -274,7 +276,7 @@ python3 "$SEARCH" "animation transition timing reduced motion" --domain ux
 ## 14. 변경 후 자가 점검
 
 - [ ] 화면에 한글이 없다
-- [ ] `CPI` 단독 표기, `30 min`, `7.0`, `probability`가 없다
+- [ ] `CPI` 단독 표기, `30 min`, `5.0`, `7.0`, `probability`가 없다
 - [ ] 컴포넌트에 hex 값 직접 사용이 없다
 - [ ] 순수 초록이 상태색으로 쓰이지 않았다
 - [ ] 상태 표시에 아이콘과 텍스트가 함께 있다

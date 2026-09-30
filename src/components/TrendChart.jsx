@@ -54,7 +54,7 @@ export function usePainTrend(target, resetKey) {
   return trend;
 }
 
-// 예측 곡선: f(0)=현재값, f(15)=예측값. Time to Threshold가 있으면 그 시점에 정확히 5.0을 지나도록 곡률을 맞춘다.
+// 예측 곡선: f(0)=현재값, f(15)=예측값. Time to Threshold가 있으면 그 시점에 정확히 임계값을 지나도록 곡률을 맞춘다.
 const forecastCurve = (v0, predicted, timeToThreshold) => {
   let k = 1.6;
   if (timeToThreshold != null && predicted > THRESHOLD && v0 < THRESHOLD) {
@@ -115,8 +115,9 @@ export default function TrendChart({ trend, metrics }) {
   const breach = metrics.predicted >= THRESHOLD;
   const forecastTone = STATUS_CLASS[breach ? "status-critical" : "status-stable"];
 
-  const PLOT_H = Math.max(MIN_PLOT_H, boxHeight - M.top - M.bottom);
-  const H = M.top + PLOT_H + M.bottom;
+  // SVG는 래퍼보다 커지지 않는다. 커지면 래퍼가 밀려 다시 커지는 되먹임이 생긴다.
+  const H = Math.max(MIN_PLOT_H + M.top + M.bottom, Math.floor(boxHeight));
+  const PLOT_H = H - M.top - M.bottom;
   const plotW = Math.max(0, width - M.left - M.right);
   const ppm = plotW / (PAST_MIN + HORIZON_MIN); // px per chart-minute
   const xNow = M.left + PAST_MIN * ppm;
@@ -150,7 +151,7 @@ export default function TrendChart({ trend, metrics }) {
         Pain Score(CPI) trend &amp; forecast
       </div>
 
-      <div ref={wrapRef} className="min-h-0 w-full flex-1 px-3">
+      <div ref={wrapRef} className="min-h-0 w-full flex-1 overflow-hidden px-3">
         {width > 0 && (
           <svg width={width} height={H} role="img" aria-label={ariaLabel} className="block">
             <defs>

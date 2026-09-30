@@ -37,10 +37,10 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
           Recommendation dismissed
         </div>
       ) : (
-        <div className={`flex flex-1 flex-col p-3 ${quiet ? "" : tone.tint}`}>
+        <div className={`flex min-h-0 flex-1 flex-col p-2.5 ${quiet ? "" : tone.tint}`}>
           <Headline phase={phase} tone={tone} quiet={quiet} recommendation={recommendation} metrics={metrics} />
 
-          <div className="mt-2 grid flex-1 content-start gap-1.5">
+          <div className="mt-1.5 grid min-h-0 flex-1 content-start gap-1">
             {phase === "idle" && (
               <>
                 <Fact label="Pain Score(CPI)" value={painFact} />
@@ -58,22 +58,22 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
             {(phase === "recommendation" || phase === "administering" || phase === "recovered") && (
               <>
                 <Fact label="Trigger" value={`Predicted Pain Score(CPI) ≥ ${THRESHOLD.toFixed(1)} within ${HORIZON_MIN} min`} />
-                <Fact label="Rationale" value="EEG arousal + ECG/PPG sympathetic shift + EMR medication interval" />
+                <Fact label="Rationale" value="Intraoperative opioid offset · propofol provides sedation without analgesia · EEG arousal + ECG/PPG sympathetic shift" />
               </>
             )}
           </div>
 
           {phase === "recommendation" && !approved && (
-            <div className="mt-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-status-stable">
+            <div className="mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-status-stable">
               <Check className="h-3.5 w-3.5 shrink-0" />
               <span className="truncate">
-                {`Safety check passed — RR ${safetyVitals.rr} · SpO₂ ${safetyVitals.spo2}% · 24h ${RECOMMENDATION.drug.toLowerCase()} ${SAFETY.fentanyl24h} ${RECOMMENDATION.unit}`}
+                {`Safety check passed — RR ${safetyVitals.rr} · SpO₂ ${safetyVitals.spo2}% · No opioid in past ${SAFETY.opioidFreeHours} h`}
               </span>
             </div>
           )}
 
           {showActions && (
-            <div className="mt-2 grid grid-cols-3 gap-1.5">
+            <div className="mt-1.5 grid grid-cols-3 gap-1.5">
               <ActionButton onClick={onDismiss} variant="ghost">Dismiss</ActionButton>
               <ActionButton onClick={() => setDoseOpen(true)} variant="ghost">Modify</ActionButton>
               <ActionButton onClick={onApprove} variant="primary">Approve</ActionButton>
@@ -124,9 +124,9 @@ function Headline({ phase, tone, quiet, recommendation, metrics }) {
 
 function Fact({ label, value }) {
   return (
-    <div className="border-t border-hairline pt-1">
+    <div className="border-t border-hairline pt-0.5">
       <div className="t-caption uppercase tracking-[0.06em]">{label}</div>
-      <div className="t-value leading-snug">{value}</div>
+      <div className="t-value leading-tight">{value}</div>
     </div>
   );
 }

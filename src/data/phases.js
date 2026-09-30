@@ -1,6 +1,8 @@
 // Bed 03 (#1468) 단계별 데이터 — PRD 6절. 화면에 보이는 모든 수치의 유일한 출처.
 
-export const THRESHOLD = 5.0; // Pain Score(CPI) 위험 기준값 (PRD 2.3)
+export const THRESHOLD = 4.0; // Pain Score(CPI) 통증 관리 목표값 (PRD 2.3).
+// 0–10 척도에서 4점이 "임상적으로 유의미한 통증"의 표준 컷오프다.
+// ICU 통증 관리 프로토콜은 Pain Score < 4 유지를 목표로 잡는다.
 export const HORIZON_MIN = 15; // 예측 지평, 분 (PRD 2.2)
 export const SCALE_MAX = 10; // Pain Score(CPI) 척도 상한 (0–10)
 export const BASELINE_WINDOW_H = 24; // Personal baseline 산출 창, 시간 (PRD 2.2)
@@ -51,7 +53,7 @@ export const PHASES = {
   warning: {
     status: STATUS.RISING,
     painScore: 1.8,
-    predicted: 6.2,
+    predicted: 5.4,
     timeToThreshold: 12,
     aiStatus: "Rising sympathetic response",
     vitals: { hr: 88, bp: "142/86", spo2: 98, rr: 18, bis: 51, temp: 36.6 },
@@ -113,9 +115,11 @@ export const RECOMMENDATION = {
 // Modify 팝업 용량 선택지 (PRD 5.6)
 export const DOSE_OPTIONS = [12.5, 25, 50];
 
-// 안전성 뱃지 — RR·SpO2는 PHASES.recommendation.vitals에서 읽는다 (PRD 5.6)
+// 안전성 뱃지 — RR·SpO2는 PHASES.recommendation.vitals에서 읽는다 (PRD 5.6).
+// 누적 오피오이드 대신 "마지막 투여 이후 경과"를 쓴다. 심장수술 환자의 24시간 누적량으로
+// 25 mcg는 비현실적으로 낮고, 안전성 검증의 목적(지금 줘도 되는가)에도 경과 시간이 더 맞는다.
 export const SAFETY = {
-  fentanyl24h: 25
+  opioidFreeHours: 3
 };
 
 // 감사추적 (PRD 5.6)

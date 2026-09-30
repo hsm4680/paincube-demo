@@ -49,11 +49,13 @@ v2의 목표는 하나다.
 |---|---|---|
 | Current Pain Score | `1.4 / 10` | 현재 통증 지수 (0–10) |
 | Predicted Pain Score | `Predicted Pain Score in 15 min` | 15분 후 예측값 |
-| **Time to Threshold** | `12 min` | **예측 곡선이 임계값 5.0에 도달하기까지 남은 시간** |
+| **Time to Threshold** | `12 min` | **예측 곡선이 목표값 4.0에 도달하기까지 남은 시간** |
 | Personal baseline | `24h adaptive` | 개인 기준선 산출 방식 |
 
 ### 2.3 임계값
-- **Pain Score ≥ 5.0** — 위험 사건의 기준값
+- **Pain Score ≥ 4.0** — 개입이 필요한 기준값. 0–10 척도에서 4점이 "임상적으로 유의미한 통증"의
+  표준 컷오프이고, ICU 통증 관리 프로토콜은 Pain Score < 4 유지를 목표로 잡는다.
+  (v2 초안의 5.0은 4.4점 환자를 STABLE로 표시하게 되어 임상적으로 성립하지 않았다)
 - 그래프에 임계선은 **그리지 않는다** (계산에만 사용)
 
 ### 2.4 Probability 지표 제거
@@ -219,23 +221,23 @@ v1은 HR에 형광 초록 `#69F24C`를 썼다. 네이비 배경에서 눈이 아
 
 | # | 병상 | ID | 환자 | 수술 | 현재 | 예측 | 상태 |
 |---|---|---|---|---|---|---|---|
-| 1 | ICU Bed 01 | #1452 | F / 58 | Mitral valve repair, POD 2 | 2.1 | 2.3 | STABLE |
-| 2 | ICU Bed 02 | #1455 | M / 64 | VATS lobectomy, POD 1 | 3.0 | 2.8 | STABLE |
+| 1 | ICU Bed 01 | #1452 | F / 58 | Mitral valve repair, POD 2 | 1.9 | 2.0 | STABLE |
+| 2 | ICU Bed 02 | #1455 | M / 64 | VATS lobectomy, POD 1 | 2.4 | 2.2 | STABLE |
 | 3 | **ICU Bed 03** | **#1468** | **M / 69** | **CABG, POD 0** | **1.4** | **1.5 → 6.8** | **주인공** |
-| 4 | ICU Bed 04 | #1471 | F / 41 | Craniotomy, tumor resection, POD 0 | 4.2 | 4.4 | STABLE |
-| 5 | ICU Bed 05 | #1473 | M / 55 | Aneurysm clipping (SAH), POD 1 | 2.6 | 2.9 | STABLE |
-| 6 | ICU Bed 06 | #1477 | F / 47 | Posterior lumbar fusion, POD 1 | **4.6** | 4.3 | STABLE |
+| 4 | ICU Bed 04 | #1471 | F / 41 | Craniotomy, tumor resection, POD 0 | 3.2 | 3.4 | STABLE |
+| 5 | ICU Bed 05 | #1473 | M / 55 | Aneurysm clipping (SAH), POD 1 | 2.1 | 2.3 | STABLE |
+| 6 | ICU Bed 06 | #1477 | F / 47 | Posterior lumbar fusion, POD 1 | **3.5** | 3.1 | STABLE |
 
 **설계 의도**
-- Bed 06은 현재값이 가장 높지만(4.6) 예측은 하강한다(4.3). "함정" 역할.
+- Bed 06은 현재값이 가장 높지만(3.5) 예측은 하강한다(3.1). "함정" 역할.
 - Bed 03(주인공)은 현재값이 가장 낮지만(1.4) 예측이 임계를 넘는다(6.8).
 - 시연 멘트: *"지금 눈으로 보면 6번이 제일 아픕니다. 그런데 PainCube는 3번을 가리킵니다."*
 
 ### 4.5 정렬 변화
 
 ```
-데모 시작 전:  Bed04(4.4) → Bed06(4.3) → Bed05(2.9) → Bed02(2.8) → Bed01(2.3) → Bed03(1.5)
-데모 시작 후:  Bed03(6.8) → Bed04(4.4) → Bed06(4.3) → Bed05(2.9) → Bed02(2.8) → Bed01(2.3)
+데모 시작 전:  Bed04(3.4) → Bed06(3.1) → Bed05(2.3) → Bed02(2.2) → Bed01(2.0) → Bed03(1.5)
+데모 시작 후:  Bed03(6.8) → Bed04(3.4) → Bed06(3.1) → Bed05(2.3) → Bed02(2.2) → Bed01(2.0)
 ```
 
 ### 4.6 나머지 5명의 거동
@@ -376,15 +378,15 @@ v2에서는 화면 전환으로 캔버스가 재마운트되므로,
 
 ### 5.4-1 색 판정 규칙 (화면 공통)
 
-**현재값·예측값을 그리는 모든 요소는 임계값 5.0 하나로만 색이 갈라진다.**
+**현재값·예측값을 그리는 모든 요소는 목표값 4.0 하나로만 색이 갈라진다.**
 
 | 조건 | 색 |
 |---|---|
-| 5.0 미만 | 중성 회색 (`--text-muted` 계열) |
-| 5.0 이상 | `--status-critical` |
+| 4.0 미만 | 중성 회색 (`--text-muted` 계열) |
+| 4.0 이상 | `--status-critical` |
 
 - 현재값을 그리는 요소는 **현재값**으로, 예측값을 그리는 요소는 **예측값**으로 판정한다.
-- **4.0 근접(caution)은 색으로 표현하지 않는다.** 눈금 위의 위치가 이미 그것을 말한다.
+- **근접 구간을 별도 색(caution)으로 표현하지 않는다.** 눈금 위의 위치가 이미 그것을 말한다.
   색을 덧붙이면 회색 `STABLE` 배지와 모순되고, 아이콘·텍스트 없는 색 단독 전달이 되어
   CLAUDE.md 4절을 위반한다.
 - 화면 단계 상태(`RISING` / `ACTION REQUIRED`)는 **상태어 배지**가 전달한다.
@@ -421,8 +423,12 @@ v1처럼 `"CPI 1.2 / 10"` 같은 **문자열 하드코딩을 절대 하지 않�
 
 뱃지의 RR·SpO₂ 값은 **recommendation 단계 vitals에서 읽는다.** 다른 단계 값을 쓰지 않는다.
 
+누적 오피오이드 대신 **마지막 투여 이후 경과 시간**을 쓴다. 심장수술 환자의 24시간 누적량으로
+`fentanyl 25 mcg`는 비현실적으로 낮아 마취과 전문의가 바로 지적한다. 안전성 검증의 목적
+("지금 줘도 되는가")에도 경과 시간이 더 맞는다.
+
 ```
-✓ Safety check passed — RR 20 · SpO₂ 97% · 24h fentanyl 25 mcg
+✓ Safety check passed — RR 20 · SpO₂ 97% · No opioid in past 3 h
 ```
 
 **액션 버튼 3개**
@@ -533,9 +539,9 @@ CABG · POD 0 · Intubated, RASS −4        ○ NRS UNAVAILABLE
 - 표현: 해당 셀 배경을 **아주 옅은 네이비 틴트**(`--brand-navy` 7%)로, **좌측에 2px `--brand-navy`** 선을 둔다.
   **상태색(caution)을 쓰지 않는다.** 이 값들은 이상치가 아니라 계산 입력이다.
   주황으로 칠하면 "우려됨"으로 읽혀 임상적으로 틀린 신호가 된다.
-  (v2 초안은 `--status-caution-tint`로 적혀 있었다. 색 판정 규칙을 임계 5.0 하나로 통일하면서 바로잡았다.)
+  (v2 초안은 `--status-caution-tint`로 적혀 있었다. 색 판정 규칙을 목표값 하나로 통일하면서 바로잡았다.)
 - 이 3개는 AI-CDSS 카드의 안전성 뱃지
-  (`✓ Safety check passed — RR 20 · SpO₂ 97% · 24h fentanyl 25 mcg`)가 검증한 항목과 일치한다
+  (`✓ Safety check passed — RR 20 · SpO₂ 97% · No opioid in past 3 h`)가 검증한 항목과 일치한다
 
 시연자가 이렇게 말할 수 있다.
 > "AI가 투약을 권고하면서 아래 세 가지를 확인했습니다. 마지막 진통제 투여 시각,
@@ -565,7 +571,7 @@ CABG · POD 0 · Intubated, RASS −4        ○ NRS UNAVAILABLE
 | 단계 | 상태어 | Pain Score | Pred +15m | Time to Threshold | AI Status |
 |---|---|---|---|---|---|
 | `idle` | STABLE | 1.4 | 1.5 | `No breach predicted` | Baseline locked |
-| `warning` | RISING | 1.8 | 6.2 | `12 min` | Rising sympathetic response |
+| `warning` | RISING | 1.8 | 5.4 | `12 min` | Rising sympathetic response |
 | `recommendation` | ACTION REQUIRED | 2.6 | 6.8 | `8 min` | Intervention recommended |
 | `administering` | TREATING | 3.1 | 3.6 | `No breach predicted` | Medication response tracking |
 | `recovered` | STABILIZED | 1.7 | 1.6 | `No breach predicted` | Pain response stabilized |
@@ -607,11 +613,11 @@ ICU 도착 후 08:10에 Acetaminophen을 투여했다. 안전성 뱃지의 `24h 
         │  Demo Start 클릭
         ▼
   T+2.0s   Bed 03 → warning 단계
-           상태어 RISING, 현재 1.8 / 예측 6.2 / Time to Threshold 12 min
-           카드가 6번째 → 1번째로 애니메이션 이동 (6.2 > 4.4)
+           상태어 RISING, 현재 1.8 / 예측 5.4 / Time to Threshold 12 min
+           카드가 6번째 → 1번째로 애니메이션 이동 (5.4 > 3.4)
         │
   T+3.5s   화면 중앙 경고 모달 + 배경 60% Dim
-           모달 수치는 warning 단계에서 읽는다 (Current 1.8 → Predicted 6.2)
+           모달 수치는 warning 단계에서 읽는다 (Current 1.8 → Predicted 5.4)
         │
         │  [View patient] 클릭
         ▼
@@ -668,10 +674,10 @@ ICU 도착 후 08:10에 Acetaminophen을 투여했다. 안전성 뱃지의 `24h 
 │                                                       │
 │   ⚠   PRE-PAIN ALERT              ICU Bed 03 · #1468  │
 │                                                       │
-│       Pain Score predicted to exceed 5.0              │
+│       Pain Score predicted to exceed 4.0              │
 │       within 15 minutes                               │
 │                                                       │
-│       Current 1.8        →        Predicted 6.2       │
+│       Current 1.8        →        Predicted 5.4       │
 │                                                       │
 │                  [  View patient  ]                   │
 │                                                       │
@@ -839,7 +845,7 @@ npx impeccable install
 ### 불변 조건 (이 단계에서도 바꾸지 않는다)
 
 - **색상 토큰 3계층** — 색약 검증을 통과한 값이다. 어떤 도구의 제안으로도 교체하지 않는다
-- **용어** — Pain Score(CPI), PRED_15M, Threshold 5.0
+- **용어** — Pain Score(CPI), PRED_15M, Threshold 4.0
 - **데이터 구조** — patients.js / phases.js
 - **높이 예산** — 1440×900 무스크롤 (5.1절)
 - **상태 전달 규칙** — 색 단독 금지, 아이콘 + 텍스트 병기
@@ -863,7 +869,7 @@ git checkout -b visual-polish
 - [ ] 화면에 한글이 하나도 없다
 - [ ] `CPI` 단독 표기가 없다 (`Pain Score(CPI)` 형태만 존재)
 - [ ] `probability` / `RISK %` 표기가 화면에서 사라졌다
-- [ ] 임계값이 전부 5.0으로 통일되어 있다
+- [ ] 임계값이 전부 4.0으로 통일되어 있다
 - [ ] 예측 지평이 전부 15분으로 통일되어 있다 (30분 표기 잔존 없음)
 - [ ] CDSS 카드의 모든 수치가 데이터에서 읽혀온다 (하드코딩 문자열 없음)
 - [ ] 화면 전환 후 파형이 직선으로 시작하지 않는다
