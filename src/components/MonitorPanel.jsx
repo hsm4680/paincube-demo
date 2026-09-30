@@ -7,7 +7,7 @@ import { HORIZON_MIN, THRESHOLD, formatTimeToThresholdShort } from "../data/phas
 // 모니터 패널 225px = 라벨 28 + 바 52 + 파형 본체 (PRD 5.1 예산). 파형은 추세 그래프 본체를 넘지 않는다.
 export default function MonitorPanel({ phase, metrics }) {
   return (
-    <section className="panel flex h-[225px] flex-col">
+    <section className="panel flex min-h-[225px] flex-[1.12] flex-col">
       <div className="section-head shrink-0">
         <HeartPulse className="h-3.5 w-3.5" />
         Patient signal monitoring
@@ -16,7 +16,7 @@ export default function MonitorPanel({ phase, metrics }) {
       <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[minmax(0,1fr)] overflow-hidden bg-monitor-bg lg:grid-cols-[1fr_140px]">
         <div className="flex min-h-0 min-w-0 flex-col overflow-hidden">
           <MonitorBar metrics={metrics} />
-          <div className="relative min-h-0 flex-1">
+          <div className="relative min-h-[150px] flex-1">
             <div className="absolute inset-0"><WaveformCanvas phase={phase} /></div>
           </div>
         </div>
@@ -28,7 +28,7 @@ export default function MonitorPanel({ phase, metrics }) {
 
 function MonitorBar({ metrics }) {
   return (
-    <div className="grid h-[56px] shrink-0 grid-cols-2 border-b border-monitor-grid bg-monitor-bar text-monitor-ink sm:grid-cols-[96px_96px_136px_minmax(160px,1fr)]">
+    <div className="monitor-bar-grid shrink-0 border-b border-monitor-grid bg-monitor-bar text-monitor-ink">
       <MonitorMetric label="Pain score" value={metrics.painScore.toFixed(1)} />
       <MonitorMetric label={`PRED_${HORIZON_MIN}M`} value={metrics.predicted.toFixed(1)} alert={metrics.predicted >= THRESHOLD} />
       <MonitorMetric label="To threshold" value={formatTimeToThresholdShort(metrics.timeToThreshold)} />
@@ -40,7 +40,7 @@ function MonitorBar({ metrics }) {
 // alert: 임계 초과 시 --monitor-alert + ▲ (PRED 칸 전용, PRD 3.3)
 function MonitorMetric({ label, value, wide = false, alert = false }) {
   return (
-    <div className="flex min-w-0 flex-col justify-center border-r border-monitor-grid px-3 last:border-r-0">
+    <div className="flex min-h-[52px] min-w-0 flex-col justify-center border-r border-monitor-grid px-3 last:border-r-0">
       <div className="truncate text-[10px] font-semibold uppercase tracking-[0.08em] text-monitor-ink-dim">{label}</div>
       <div className={`truncate tabular-nums ${wide ? "text-sm font-semibold" : "text-lg font-bold tracking-[-0.02em]"} ${alert ? "text-monitor-alert" : "text-monitor-ink"}`}>
         {value}

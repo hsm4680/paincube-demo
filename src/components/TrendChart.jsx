@@ -10,8 +10,8 @@ const PAST_MIN = 60;
 const TICK_MS = 1000; // 실제 1초
 const X_TICKS = [-60, -45, -30, -15, 0, 15];
 const Y_TICKS = [0, 2, 4, 6, 8, 10];
-// 카드 200px 예산 안에서의 본체 높이 (PRD 5.1). 파형 본체보다 작아지지 않는다.
-const PLOT_H = 130;
+// 카드 200px 예산에서의 최소 본체 높이 (PRD 5.1). 카드가 커지면 함께 늘어난다.
+const MIN_PLOT_H = 130;
 const M = { top: 10, right: 50, bottom: 18, left: 30 };
 
 const clamp = (v) => Math.min(SCALE_MAX, Math.max(0, v));
@@ -80,14 +80,20 @@ const usePrefersReducedMotion = () => {
 export default function TrendChart({ trend, metrics }) {
   const wrapRef = useRef(null);
   const [width, setWidth] = useState(0);
+  const [boxHeight, setBoxHeight] = useState(0);
   const [frac, setFrac] = useState(0);
   const reducedMotion = usePrefersReducedMotion();
 
   useLayoutEffect(() => {
     const el = wrapRef.current;
-    const ro = new ResizeObserver(([entry]) => setWidth(entry.contentRect.width));
+    const ro = new ResizeObserver(([entry]) => {
+      setWidth(entry.contentRect.width);
+      setBoxHeight(entry.contentRect.height);
+    });
     ro.observe(el);
-    setWidth(el.getBoundingClientRect().width);
+    const rect = el.getBoundingClientRect();
+    setWidth(rect.width);
+    setBoxHeight(rect.height);
     return () => ro.disconnect();
   }, []);
 
@@ -109,6 +115,7 @@ export default function TrendChart({ trend, metrics }) {
   const breach = metrics.predicted >= THRESHOLD;
   const forecastTone = STATUS_CLASS[breach ? "status-critical" : "status-stable"];
 
+  const PLOT_H = Math.max(MIN_PLOT_H, boxHeight - M.top - M.bottom);
   const H = M.top + PLOT_H + M.bottom;
   const plotW = Math.max(0, width - M.left - M.right);
   const ppm = plotW / (PAST_MIN + HORIZON_MIN); // px per chart-minute
@@ -137,13 +144,13 @@ export default function TrendChart({ trend, metrics }) {
   const ariaLabel = `Pain Score(CPI) trend, past ${PAST_MIN} min and ${HORIZON_MIN} min forecast. Current ${metrics.painScore.toFixed(1)} / ${SCALE_MAX}, predicted ${metrics.predicted.toFixed(1)} in ${HORIZON_MIN} min.`;
 
   return (
-    <section className="panel flex h-[200px] flex-col">
+    <section className="panel flex min-h-[200px] flex-[1] flex-col">
       <div className="section-head">
         <LineChart className="h-3.5 w-3.5" />
         Pain Score(CPI) trend &amp; forecast
       </div>
 
-      <div ref={wrapRef} className="w-full px-3">
+      <div ref={wrapRef} className="min-h-0 w-full flex-1 px-3">
         {width > 0 && (
           <svg width={width} height={H} role="img" aria-label={ariaLabel} className="block">
             <defs>
@@ -161,7 +168,7 @@ export default function TrendChart({ trend, metrics }) {
               </g>
             ))}
 
-            {X_TICKS.map((t) => (
+            {X_TICKS.filter((t) => plotW >= 420 || t === -PAST_MIN || t === 0 || t === HORIZON_MIN).map((t) => (
               <g key={`x${t}`}>
                 {t !== 0 && <line x1={x(t)} x2={x(t)} y1={M.top} y2={M.top + PLOT_H} className="stroke-chart-grid" strokeWidth="1" />}
                 <text

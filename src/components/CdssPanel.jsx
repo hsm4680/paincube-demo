@@ -23,7 +23,7 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
   };
 
   return (
-    <section className="panel relative flex h-[265px] flex-col">
+    <section className="panel relative flex min-h-[265px] flex-1 flex-col">
       <div className="section-head justify-between">
         <span className="flex items-center gap-2">
           <FileCheck2 className="h-3.5 w-3.5" />

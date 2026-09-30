@@ -107,7 +107,7 @@ function App() {
 
   return (
     <main className="min-h-screen bg-page-bg text-text-primary">
-      <div className="mx-auto flex min-h-screen max-w-[1760px] flex-col gap-4 px-3 py-3 sm:px-6">
+      <div className="mx-auto flex min-h-screen max-w-[2400px] flex-col gap-4 px-3 py-3 sm:px-6">
         <Header
           patient={onDetail ? patient : null}
           onStart={startDemo}
@@ -131,11 +131,9 @@ function App() {
         ) : (
           <WardDashboard heroMetrics={heroMetrics} onOpenPatient={openPatient} resetKey={resetKey} />
         )}
-      </div>
 
-      {/* 우측 하단 고정 — 두 화면 모두 표시 (PRD 10.1) */}
-      <div className="pointer-events-none fixed bottom-2 right-3 z-40 t-caption">
-        For investigational use only — not for clinical decision-making
+        {/* 문서 흐름의 맨 아래 — 콘텐츠와 겹치지 않는다 (PRD 10.1) */}
+        <div className="t-caption shrink-0 text-right">For investigational use only — not for clinical decision-making</div>
       </div>
 
       {modalOpen && (

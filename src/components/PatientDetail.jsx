@@ -12,14 +12,14 @@ import StatusBadge from "./StatusBadge.jsx";
 export default function PatientDetail({ phase, metrics, trend, approvalState, dose, onApprove, onDismiss, onModify, dismissed }) {
   return (
     <div className="flex flex-1 flex-col gap-4">
-      <div className="flex h-24 flex-col gap-1.5">
+      <div className="flex min-h-24 shrink-0 flex-col gap-1.5">
         <div className="flex h-[26px] items-center">
           <StatusBadge status={metrics.status} />
         </div>
         <KpiRow metrics={metrics} />
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[1.4fr_1fr]">
+      <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[1.4fr_1fr]">
         <div className="flex min-w-0 flex-col gap-4">
           <TrendChart trend={trend} metrics={metrics} />
           <MonitorPanel phase={phase} metrics={metrics} />

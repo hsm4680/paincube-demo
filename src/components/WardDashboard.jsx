@@ -4,21 +4,28 @@ import { HERO_BED, PAIN_JITTER, PATIENTS } from "../data/patients.js";
 import { STATUS } from "../data/phases.js";
 
 const GAP = 16; // px, 카드 간격
-// 데스크톱(3열): 헤더 85 + 페이지 패딩 32 + 섹션 간격 16 = 133px를 뺀 높이를 쓰되
-// 카드는 내용이 채우는 만큼만 높인다(카드 302px × 2행). 그 이상은 숫자 주변이 비어 보인다.
-const GRID_H = "min(calc(100vh - 140px), 620px)";
-const CARD_H_SM = 200; // px, 2열·1열에서는 고정 높이 + 페이지 스크롤
+// 카드 하나가 잘림·줄바꿈 없이 들어가는 최소 폭. 열 수는 뷰포트가 아니라 이 값과
+// 컨테이너 실제 폭으로 정한다. 내부 요소가 잘리면 그 열 수가 틀린 것이다.
+const MIN_CARD_W = 268;
+const MIN_CARD_H = 208; // px, 카드가 이보다 낮아지지 않는다
+const CARD_H_SM = 196; // px, 3행 이상일 때는 고정 높이 + 페이지 스크롤
 
-// 카드 폭 = 열 폭이므로 translate의 100%는 한 칸 이동과 같다.
-const columnsFor = (width) => (width >= 1024 ? 3 : width >= 640 ? 2 : 1);
-
-function useColumns() {
-  const [cols, setCols] = useState(() => (typeof window === "undefined" ? 3 : columnsFor(window.innerWidth)));
+// 컨테이너 폭을 직접 재서 열 수를 정한다 (미디어 쿼리가 아니라 컨테이너 기준)
+function useGridColumns(ref) {
+  const [cols, setCols] = useState(3);
   useEffect(() => {
-    const onResize = () => setCols(columnsFor(window.innerWidth));
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
+    const el = ref.current;
+    if (!el) return undefined;
+    const measure = (width) => {
+      if (!width) return;
+      const fit = Math.floor((width + GAP) / (MIN_CARD_W + GAP));
+      setCols(Math.max(1, Math.min(3, fit)));
+    };
+    const observer = new ResizeObserver(([entry]) => measure(entry.contentRect.width));
+    observer.observe(el);
+    measure(el.getBoundingClientRect().width);
+    return () => observer.disconnect();
+  }, [ref]);
   return cols;
 }
 
@@ -46,12 +53,15 @@ function useJitter(resetKey) {
 }
 
 export default function WardDashboard({ heroMetrics, onOpenPatient, resetKey }) {
-  const cols = useColumns();
+  const gridRef = useRef(null);
+  const cols = useGridColumns(gridRef);
   const jitter = useJitter(resetKey);
   const rows = Math.ceil(PATIENTS.length / cols);
-  const wide = cols === 3;
-  const gridHeight = wide ? GRID_H : rows * CARD_H_SM + (rows - 1) * GAP;
-  const cardHeight = wide ? `calc((100% - ${(rows - 1) * GAP}px) / ${rows})` : CARD_H_SM;
+  // 2행 이하면 남는 세로 공간을 카드 높이가 흡수한다. 3행 이상은 고정 높이 + 페이지 스크롤.
+  const fills = rows <= 2;
+  const minHeight = rows * MIN_CARD_H + (rows - 1) * GAP;
+  const gridHeight = fills ? `max(${minHeight}px, calc(100vh - 154px))` : rows * CARD_H_SM + (rows - 1) * GAP;
+  const cardHeight = fills ? `calc((100% - ${(rows - 1) * GAP}px) / ${rows})` : CARD_H_SM;
 
   const cards = useMemo(() => {
     const rowsData = PATIENTS.map((patient) => {
@@ -68,8 +78,8 @@ export default function WardDashboard({ heroMetrics, onOpenPatient, resetKey }) 
   }, [heroMetrics, jitter]);
 
   return (
-    <section className="flex flex-1 items-center" aria-label="ICU ward patient beds, sorted by predicted Pain Score">
-      <div className="relative w-full" style={{ height: gridHeight }}>
+    <section className="flex flex-1 flex-col" aria-label="ICU ward patient beds, sorted by predicted Pain Score">
+      <div ref={gridRef} className="relative w-full" style={{ height: gridHeight }}>
       {cards.map((card, index) => {
         const col = index % cols;
         const row = Math.floor(index / cols);

@@ -32,7 +32,7 @@ export default function EmrPanel({ phase, metrics, dose }) {
   const safetyActive = phase === "recommendation";
 
   return (
-    <section className="panel flex h-24 flex-col">
+    <section className="panel flex min-h-24 shrink-0 flex-col">
       <div className="section-head justify-between">
         <span>EMR context — inputs to prediction and safety check</span>
         <span className="hidden text-[9px] font-medium normal-case tracking-[0.04em] text-white/55 lg:inline">
@@ -40,7 +40,7 @@ export default function EmrPanel({ phase, metrics, dose }) {
         </span>
       </div>
 
-      <div className="grid flex-1 grid-cols-2 sm:grid-cols-3 lg:grid-cols-[var(--emr-cols)]" style={{ "--emr-cols": COLUMNS }}>
+      <div className="emr-grid flex-1" style={{ "--emr-cols": COLUMNS }}>
         {items.map((item, index) => (
           <EmrCell
             key={item.key}
@@ -59,7 +59,7 @@ function EmrCell({ label, value, role, divided, highlighted }) {
     <div className={`emr-cell flex min-w-0 flex-col ${divided ? "rule-l" : ""}`}>
       <div className="label-band truncate px-2 py-[3px]">{label}</div>
       <div className={`flex min-w-0 flex-1 flex-col justify-center px-2 ${highlighted ? "emr-referenced" : ""}`}>
-        <div className="t-value truncate" title={value}>
+        <div className="t-value line-clamp-2" title={value}>
           {value}
         </div>
         <div className="t-caption truncate">{role}</div>

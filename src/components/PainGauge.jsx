@@ -38,7 +38,7 @@ export default function PainGauge({ metrics }) {
   const forward = metrics.predicted >= metrics.painScore;
 
   return (
-    <section className="panel flex h-[160px] flex-col">
+    <section className="panel flex min-h-[160px] shrink-0 flex-col">
       <div className="section-head">Pain forecast</div>
 
       <div className="flex flex-1 items-center gap-4 px-4">

@@ -8,7 +8,7 @@ export default function KpiRow({ metrics }) {
   const forecast = STATUS_CLASS[breach ? "status-critical" : "status-stable"];
 
   return (
-    <div className="panel grid flex-1 grid-cols-3">
+    <div className="panel kpi-grid flex-1">
       <Kpi label="Current Pain Score" value={metrics.painScore.toFixed(1)} unit={`/ ${SCALE_MAX}`} />
       <Kpi
         label={`Predicted · ${HORIZON_MIN} min`}
@@ -30,7 +30,7 @@ export default function KpiRow({ metrics }) {
 
 function Kpi({ label, value, unit, valueClass, small = false, divided = false }) {
   return (
-    <div className={`flex min-w-0 items-baseline gap-2 px-4 py-2 ${divided ? "rule-l" : ""}`}>
+    <div className={`kpi-cell flex min-w-0 items-baseline gap-2 px-4 py-2 ${divided ? "rule-l" : ""}`}>
       <span className="t-label shrink-0">{label}</span>
       <span className="ml-auto flex items-baseline gap-1.5">
         <span className={`${small ? "t-value text-text-label" : "t-hero"} ${valueClass ?? ""}`}>{value}</span>
