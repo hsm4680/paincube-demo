@@ -1,5 +1,6 @@
 import React from "react";
 import { ArrowLeft, Circle, Play, RefreshCw } from "lucide-react";
+import StatusBadge from "./StatusBadge.jsx";
 import paincubeLogo from "../assets/paincube-logo.png";
 import { WARD, bedLabel, contextLine, patientIdLabel, profileLabel } from "../data/patients.js";
 import { HORIZON_MIN } from "../data/phases.js";
@@ -7,14 +8,14 @@ import { HORIZON_MIN } from "../data/phases.js";
 // 상단 바는 네이비 블록이다 — 화면의 구조를 만드는 첫 번째 요소 (Ref_05).
 // 로고는 네이비 위에서 읽히지 않으므로 흰 판 위에 얹는다.
 // patient가 없으면 Ward Dashboard 헤더, 있으면 Patient Detail 헤더다. 높이 84px (PRD 5.1 예산).
-export default function Header({ patient, onStart, onReset, onBack, demoRunning }) {
+export default function Header({ patient, status, onStart, onReset, onBack, demoRunning }) {
   return (
-    <header className="flex min-h-[72px] flex-col items-stretch overflow-hidden rounded-[var(--radius-card)] bg-brand-navy sm:h-[72px] sm:flex-row">
+    <header className="flex min-h-[72px] flex-col items-stretch overflow-hidden rounded-[var(--radius-card)] bg-brand-navy sm:flex-row xl:h-[72px]">
       <div className="flex shrink-0 items-center justify-center bg-card-surface px-4 py-2 sm:py-0">
         <img src={paincubeLogo} alt="PainCube" className="h-9 w-auto" />
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3 px-4 py-2 sm:flex-nowrap sm:gap-4 sm:px-5 sm:py-0">
+      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3 px-4 py-2 sm:gap-4 sm:px-5 xl:flex-nowrap xl:py-0">
         {onBack && (
           <button
             type="button"
@@ -43,7 +44,13 @@ export default function Header({ patient, onStart, onReset, onBack, demoRunning 
           </div>
         )}
 
-        <div className="ml-auto flex shrink-0 items-center gap-2">
+        {status && (
+          <div className="ml-auto flex shrink-0 items-center">
+            <StatusBadge status={status} size="lg" />
+          </div>
+        )}
+
+        <div className={`flex shrink-0 items-center gap-2 ${status ? "" : "ml-auto"}`}>
           <button
             type="button"
             onClick={onStart}

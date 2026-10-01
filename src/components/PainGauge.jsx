@@ -18,7 +18,7 @@ const arc = (from, to) => {
   return `M${fmt(polar(from, R))} A${R},${R} 0 ${largeArc} ${to > from ? 1 : 0} ${fmt(polar(to, R))}`;
 };
 
-export default function PainGauge({ metrics }) {
+export default function PainGauge({ metrics, live }) {
   const noBreach = metrics.timeToThreshold == null;
 
   return (
@@ -27,8 +27,8 @@ export default function PainGauge({ metrics }) {
 
       <div className="flex min-h-0 flex-1 flex-col px-3 py-2">
         <div className="grid flex-1 grid-cols-3">
-          <Dial value={metrics.painScore} label="Current Pain Score" />
-          <Dial value={metrics.predicted} label={`Predicted · ${HORIZON_MIN} min`} divided />
+          <Dial value={live ? live.painScore : metrics.painScore} base={metrics.painScore} label="Current Pain Score" />
+          <Dial value={live ? live.predicted : metrics.predicted} base={metrics.predicted} label={`Predicted · ${HORIZON_MIN} min`} divided />
           <Figure
             primary={noBreach ? "No breach" : `${metrics.timeToThreshold}`}
             secondary={noBreach ? "predicted" : "min"}
@@ -38,28 +38,31 @@ export default function PainGauge({ metrics }) {
           />
         </div>
 
-        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-t border-hairline pt-1.5">
-          <span className="t-caption">
-            <span className="font-semibold uppercase tracking-[0.06em]">Target</span>
-            {` · Pain Score < ${THRESHOLD.toFixed(1)}`}
-          </span>
-          <span className="t-caption">
-            <span className="font-semibold uppercase tracking-[0.06em]">Personal baseline</span>
-            {` · ${BASELINE_WINDOW_H}h adaptive`}
-          </span>
+        {/* baseline은 환자마다 다르다는 것이 데모의 설명 포인트라 Target과 동급으로 둔다 */}
+        <div className="mt-1 grid gap-0.5 border-t border-hairline pt-1.5">
+          <div className="flex items-baseline justify-between gap-3">
+            <span className="forecast-foot-label">Personal baseline</span>
+            <span className="forecast-foot-value">{`${BASELINE_WINDOW_H}h adaptive`}</span>
+          </div>
+          <div className="flex items-baseline justify-between gap-3">
+            <span className="forecast-foot-label">Target</span>
+            <span className="forecast-foot-value">{`Pain Score < ${THRESHOLD.toFixed(1)}`}</span>
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-function Dial({ value, label, divided = false }) {
-  const breach = value >= THRESHOLD;
+// 색 판정은 기준값(base)으로 한다 — 표시값은 흔들려도 색은 깜빡이지 않는다
+function Dial({ value, base, label, divided = false }) {
+  const breach = base >= THRESHOLD;
   const stroke = breach ? "stroke-status-critical" : "stroke-text-muted";
   const [tickInner, tickOuter] = [polar(THRESHOLD, R - 9), polar(THRESHOLD, R + 9)];
 
   return (
-    <div className={`forecast-cell flex min-w-0 flex-col items-center justify-center gap-1 px-2 ${divided ? "rule-l" : ""}`}>
+    <div className={`forecast-cell flex min-w-0 flex-col items-center justify-center gap-2 px-2 ${divided ? "rule-l" : ""}`}>
+      <div className="forecast-label text-center">{label}</div>
       <div className="forecast-dial relative aspect-square">
         <svg viewBox="0 0 120 120" role="img" aria-label={`${label} ${value.toFixed(1)} of ${SCALE_MAX}`}>
           <circle cx={CX} cy={CY} r={R} fill="none" className="stroke-hairline" strokeWidth="9" />
@@ -78,7 +81,6 @@ function Dial({ value, label, divided = false }) {
           <span className={`forecast-value ${breach ? "text-status-critical" : "text-text-primary"}`}>{value.toFixed(1)}</span>
         </div>
       </div>
-      <div className="forecast-label text-center">{label}</div>
     </div>
   );
 }
@@ -86,12 +88,12 @@ function Dial({ value, label, divided = false }) {
 // Time to Threshold는 시각화하지 않는다. 수치만 게이지 숫자와 비슷한 비중으로 둔다.
 function Figure({ primary, secondary, label, breach, text = false }) {
   return (
-    <div className="forecast-cell rule-l flex min-w-0 flex-col items-center justify-center gap-1 px-2">
+    <div className="forecast-cell rule-l flex min-w-0 flex-col items-center justify-center gap-2 px-2">
+      <div className="forecast-label text-center">{label}</div>
       <div className="flex flex-col items-center">
         <span className={`${text ? "forecast-value-text" : "forecast-value"} ${breach ? "text-status-critical" : "text-text-primary"}`}>{primary}</span>
         <span className="forecast-sub">{secondary}</span>
       </div>
-      <div className="forecast-label text-center">{label}</div>
     </div>
   );
 }

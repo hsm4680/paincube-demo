@@ -110,6 +110,7 @@ function App() {
       <div className="mx-auto flex min-h-screen max-w-[2400px] flex-col gap-3 px-3 py-3 sm:px-6 lg:h-screen lg:overflow-y-auto">
         <Header
           patient={onDetail ? patient : null}
+          status={onDetail ? metrics.status : null}
           onStart={startDemo}
           onReset={handleReset}
           onBack={onDetail ? () => setScreen("ward") : undefined}
