@@ -145,7 +145,7 @@ export default function TrendChart({ trend, metrics }) {
   const ariaLabel = `Pain Score(CPI) trend, past ${PAST_MIN} min and ${HORIZON_MIN} min forecast. Current ${metrics.painScore.toFixed(1)} / ${SCALE_MAX}, predicted ${metrics.predicted.toFixed(1)} in ${HORIZON_MIN} min.`;
 
   return (
-    <section className="panel flex h-full min-h-0 flex-col">
+    <section className="panel flex h-full min-h-0 w-full flex-col">
       <div className="section-head">
         <LineChart className="h-3.5 w-3.5" />
         Pain Score(CPI) trend &amp; forecast

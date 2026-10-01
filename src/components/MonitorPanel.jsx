@@ -7,7 +7,7 @@ import { HORIZON_MIN, THRESHOLD, formatTimeToThresholdShort } from "../data/phas
 // 모니터 패널 225px = 라벨 28 + 바 52 + 파형 본체 (PRD 5.1 예산). 파형은 추세 그래프 본체를 넘지 않는다.
 export default function MonitorPanel({ phase, metrics, live }) {
   return (
-    <section className="panel flex h-full min-h-0 flex-col">
+    <section className="panel flex h-full min-h-0 w-full flex-col">
       <div className="section-head shrink-0">
         <HeartPulse className="h-3.5 w-3.5" />
         Patient signal monitoring

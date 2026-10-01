@@ -23,7 +23,7 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
   };
 
   return (
-    <section className="cdss-card panel relative flex h-full min-h-0 flex-col border-cdss-border bg-cdss-surface">
+    <section className="cdss-card panel relative flex h-full min-h-0 w-full flex-col border-cdss-border bg-cdss-surface">
       <div className="section-head justify-between">
         <span className="flex items-center gap-2">
           <FileCheck2 className="h-4 w-4" />
@@ -33,14 +33,14 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
       </div>
 
       {dismissed ? (
-        <div className="flex min-h-0 flex-1 items-center justify-center px-4 text-[15px] font-semibold text-text-label">
+        <div className="flex min-h-0 flex-1 items-center justify-center px-4 text-[18px] font-semibold text-text-label">
           Recommendation dismissed
         </div>
       ) : (
-        <div className={`flex min-h-0 flex-1 flex-col p-2.5 ${quiet ? "" : `${tone.tint} rounded-[var(--radius-control)]`}`}>
+        <div className={`flex min-h-0 flex-1 flex-col p-3 ${quiet ? "" : `${tone.tint} rounded-[var(--radius-control)]`}`}>
           <Headline phase={phase} tone={tone} quiet={quiet} recommendation={recommendation} metrics={metrics} />
 
-          <div className="mt-1.5 grid min-h-0 flex-1 content-evenly gap-1">
+          <div className="mt-2 grid min-h-0 flex-1 content-evenly gap-1 overflow-hidden">
             {phase === "idle" && (
               <>
                 <Fact label="Pain Score(CPI)" value={painFact} />
@@ -64,8 +64,8 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
           </div>
 
           {phase === "recommendation" && !approved && (
-            <div className="cdss-meta mt-2 flex items-start gap-1.5 uppercase text-status-stable">
-              <Check className="mt-0.5 h-4 w-4 shrink-0" />
+            <div className="cdss-meta mt-2 flex items-start gap-2 uppercase text-status-stable">
+              <Check className="mt-0.5 h-5 w-5 shrink-0" />
               <span className="min-w-0">
                 {`Safety check passed — RR ${safetyVitals.rr} · SpO₂ ${safetyVitals.spo2}% · No opioid in past ${SAFETY.opioidFreeHours} h`}
               </span>
@@ -73,7 +73,7 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
           )}
 
           {showActions && (
-            <div className="mt-1.5 grid grid-cols-3 gap-1.5">
+            <div className="mt-2 grid grid-cols-3 gap-2">
               <ActionButton onClick={onDismiss} variant="ghost">Dismiss</ActionButton>
               <ActionButton onClick={() => setDoseOpen(true)} variant="ghost">Modify</ActionButton>
               <ActionButton onClick={onApprove} variant="primary">Approve</ActionButton>
@@ -82,7 +82,7 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
 
           {approved && (
             <div className="mt-1.5">
-              <div className="flex h-10 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-brand-navy text-[14px] font-semibold text-white" role="status" aria-live="polite" aria-busy={approvalState === "loading"}>
+              <div className="flex h-11 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-brand-navy text-[15px] font-semibold text-white" role="status" aria-live="polite" aria-busy={approvalState === "loading"}>
                 {approvalState === "loading" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
                 {approvalState === "loading" ? "Approving order" : "Administration complete"}
               </div>
@@ -111,11 +111,11 @@ function Headline({ phase, tone, quiet, recommendation, metrics }) {
 
   return (
     <div className="flex items-start gap-3">
-      <span className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-control)] ${quiet ? "bg-white/70 text-text-label" : `bg-card-surface ${tone.text}`}`}>
-        <copy.Icon className="h-5 w-5" />
+      <span className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] ${quiet ? "bg-white/70 text-text-label" : `bg-card-surface ${tone.text}`}`}>
+        <copy.Icon className="h-6 w-6" />
       </span>
       <div className="min-w-0">
-        <div className={`cdss-kicker truncate ${quiet ? "text-text-label" : tone.text}`}>{copy.title}</div>
+        <div className={`cdss-kicker ${quiet ? "text-text-label" : tone.text}`}>{copy.title}</div>
         <div className="cdss-headline">{copy.detail}</div>
       </div>
     </div>
@@ -124,7 +124,7 @@ function Headline({ phase, tone, quiet, recommendation, metrics }) {
 
 function Fact({ label, value }) {
   return (
-    <div className="border-t border-hairline pt-0.5">
+    <div className="border-t border-hairline pt-2">
       <div className="cdss-label">{label}</div>
       <div className="cdss-body">{value}</div>
     </div>
@@ -140,7 +140,7 @@ function ActionButton({ children, onClick, variant }) {
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex h-10 items-center justify-center rounded-[var(--radius-control)] text-[14px] font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel ${style}`}
+      className={`inline-flex h-11 items-center justify-center rounded-[var(--radius-control)] text-[15px] font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel ${style}`}
     >
       {children}
     </button>
@@ -181,5 +181,5 @@ function AuditTrail({ dose }) {
   const text = modified
     ? `${AUDIT.approvedAt} · Approved by ${AUDIT.clinician} (ID ${AUDIT.clinicianId}) · Recommended ${RECOMMENDATION.dose} ${RECOMMENDATION.unit} · Administered ${dose} ${RECOMMENDATION.unit} (modified)`
     : `${AUDIT.approvedAt} · Approved by ${AUDIT.clinician} (ID ${AUDIT.clinicianId}) · Sent to EMR — Ack ${AUDIT.ackAt}`;
-  return <div className="mt-1.5 text-[11px] text-text-muted" title={text}>{text}</div>;
+  return <div className="mt-2 text-[12px] text-text-muted" title={text}>{text}</div>;
 }

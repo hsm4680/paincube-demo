@@ -22,10 +22,10 @@ export default function PainGauge({ metrics, live }) {
   const noBreach = metrics.timeToThreshold == null;
 
   return (
-    <section className="panel flex h-full flex-col">
+    <section className="panel flex h-full w-full min-h-0 flex-col">
       <div className="section-head">Pain forecast</div>
 
-      <div className="flex min-h-0 flex-1 flex-col px-3 py-2">
+      <div className="flex min-h-0 flex-1 flex-col px-3 pb-2 pt-1.5">
         <div className="grid flex-1 grid-cols-3">
           <Dial value={live ? live.painScore : metrics.painScore} base={metrics.painScore} label="Current Pain Score" />
           <Dial value={live ? live.predicted : metrics.predicted} base={metrics.predicted} label={`Predicted · ${HORIZON_MIN} min`} divided />
@@ -61,7 +61,7 @@ function Dial({ value, base, label, divided = false }) {
   const [tickInner, tickOuter] = [polar(THRESHOLD, R - 9), polar(THRESHOLD, R + 9)];
 
   return (
-    <div className={`forecast-cell flex min-w-0 flex-col items-center justify-center gap-2 px-2 ${divided ? "rule-l" : ""}`}>
+    <div className={`forecast-cell flex min-w-0 flex-col items-center justify-center gap-1.5 px-2 ${divided ? "rule-l" : ""}`}>
       <div className="forecast-label text-center">{label}</div>
       <div className="forecast-dial relative aspect-square">
         <svg viewBox="0 0 120 120" role="img" aria-label={`${label} ${value.toFixed(1)} of ${SCALE_MAX}`}>
@@ -88,7 +88,7 @@ function Dial({ value, base, label, divided = false }) {
 // Time to Threshold는 시각화하지 않는다. 수치만 게이지 숫자와 비슷한 비중으로 둔다.
 function Figure({ primary, secondary, label, breach, text = false }) {
   return (
-    <div className="forecast-cell rule-l flex min-w-0 flex-col items-center justify-center gap-2 px-2">
+    <div className="forecast-cell rule-l flex min-w-0 flex-col items-center justify-center gap-1.5 px-2">
       <div className="forecast-label text-center">{label}</div>
       <div className="flex flex-col items-center">
         <span className={`${text ? "forecast-value-text" : "forecast-value"} ${breach ? "text-status-critical" : "text-text-primary"}`}>{primary}</span>

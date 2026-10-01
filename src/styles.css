@@ -137,14 +137,25 @@ button {
     letter-spacing: 0.08em;
   }
 
-  /* 표 안의 라벨 열·라벨 행 — 두 번째 네이비 톤 */
+  /* 컬럼 라벨 행 — 짙은 타이틀 바와 뭉개지지 않도록 밝은 표면으로 둔다.
+     짙은 타이틀 → 밝은 컬럼 라벨 → 흰 데이터 행의 3단 위계를 만든다.
+     네이비 위 흰 10px보다 이쪽이 가독성도 높다. */
   .label-band {
-    background: var(--brand-panel);
-    color: rgba(255, 255, 255, 0.92);
-    font-size: 10px;
+    background: var(--page-bg);
+    color: var(--text-label);
+    border-bottom: 1px solid var(--hairline);
+    font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
+  }
+
+  /* EMR 데이터 행 — 값과 역할 태그가 별개 층위로 읽히게 벌린다 */
+  .emr-value {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--text-primary);
   }
 
   /* 셀 구분은 세로선만 */
@@ -159,7 +170,7 @@ button {
   }
 
   .cdss-headline {
-    font-size: clamp(19px, 2.4cqw, 28px);
+    font-size: clamp(27px, 3.5cqw, 40px);
     font-weight: 700;
     letter-spacing: -0.015em;
     line-height: 1.2;
@@ -167,14 +178,14 @@ button {
   }
 
   .cdss-kicker {
-    font-size: 12px;
+    font-size: 15px;
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
   .cdss-label {
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -182,14 +193,14 @@ button {
   }
 
   .cdss-body {
-    font-size: 15px;
+    font-size: 21px;
     font-weight: 500;
-    line-height: 1.45;
+    line-height: 1.38;
     color: var(--text-primary);
   }
 
   .cdss-meta {
-    font-size: 12px;
+    font-size: 15px;
     font-weight: 600;
     letter-spacing: 0.04em;
   }
@@ -200,11 +211,11 @@ button {
   }
 
   .forecast-dial {
-    width: clamp(72px, 62cqw, 132px);
+    width: clamp(60px, 48cqw, 104px);
   }
 
   .forecast-value {
-    font-size: clamp(20px, 17cqw, 38px);
+    font-size: clamp(19px, 15cqw, 34px);
     font-weight: 800;
     letter-spacing: -0.03em;
     line-height: 1;
@@ -232,8 +243,8 @@ button {
     font-weight: 600;
     letter-spacing: 0.01em;
     color: var(--text-label);
-    line-height: 1.25;
-    min-height: 2.5em;
+    line-height: 1.2;
+    min-height: 1.4em;
     display: flex;
     align-items: flex-end;
     justify-content: center;
