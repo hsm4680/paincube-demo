@@ -77,7 +77,7 @@ const usePrefersReducedMotion = () => {
   return reduced;
 };
 
-export default function TrendChart({ trend, metrics }) {
+export default function TrendChart({ trend, metrics, live }) {
   const wrapRef = useRef(null);
   const [width, setWidth] = useState(0);
   const [boxHeight, setBoxHeight] = useState(0);
@@ -112,6 +112,8 @@ export default function TrendChart({ trend, metrics }) {
     return () => cancelAnimationFrame(raf);
   }, [trend.tickAt, reducedMotion]);
 
+  // 라벨과 점선 끝점 모두 같은 표시값을 따른다. 색 판정만 기준값으로 한다.
+  const shownPredicted = live ? live.predicted : metrics.predicted;
   const breach = metrics.predicted >= THRESHOLD;
   const forecastTone = STATUS_CLASS[breach ? "status-critical" : "status-stable"];
 
@@ -136,13 +138,13 @@ export default function TrendChart({ trend, metrics }) {
   observed.push([xNow, y(head)]);
   const observedPath = observed.map(([px, py], i) => `${i ? "L" : "M"}${px.toFixed(1)},${py.toFixed(1)}`).join("");
 
-  const f = forecastCurve(head, metrics.predicted, metrics.timeToThreshold);
+  const f = forecastCurve(head, shownPredicted, metrics.timeToThreshold);
   const forecastPts = [];
   for (let t = 0; t <= HORIZON_MIN; t += 0.5) forecastPts.push([x(t), y(clamp(f(t)))]);
   const forecastPath = forecastPts.map(([px, py], i) => `${i ? "L" : "M"}${px.toFixed(1)},${py.toFixed(1)}`).join("");
   const [endX, endY] = forecastPts[forecastPts.length - 1];
 
-  const ariaLabel = `Pain Score(CPI) trend, past ${PAST_MIN} min and ${HORIZON_MIN} min forecast. Current ${metrics.painScore.toFixed(1)} / ${SCALE_MAX}, predicted ${metrics.predicted.toFixed(1)} in ${HORIZON_MIN} min.`;
+  const ariaLabel = `Pain Score(CPI) trend, past ${PAST_MIN} min and ${HORIZON_MIN} min forecast. Current ${metrics.painScore.toFixed(1)} / ${SCALE_MAX}, predicted ${shownPredicted.toFixed(1)} in ${HORIZON_MIN} min.`;
 
   return (
     <section className="panel flex h-full min-h-0 w-full flex-col">
@@ -194,7 +196,7 @@ export default function TrendChart({ trend, metrics }) {
             <circle cx={xNow} cy={y(head)} r="5" className="fill-chart-observed stroke-white" strokeWidth="2" />
             <circle cx={endX} cy={endY} r="5" className={`fill-white ${forecastTone.stroke}`} strokeWidth="2.5" />
             <text x={endX + 9} y={endY} dy="0.35em" className={`text-[15px] font-extrabold tabular-nums tracking-[-0.02em] ${breach ? "fill-status-critical" : "fill-status-stable"}`}>
-              {metrics.predicted.toFixed(1)}
+              {shownPredicted.toFixed(1)}
             </text>
           </svg>
         )}

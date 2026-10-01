@@ -543,6 +543,76 @@ v1처럼 `"CPI 1.2 / 10"` 같은 **문자열 하드코딩을 절대 하지 않�
 AI가 권고한 값과 임상의가 실제로 결정한 값이 화면에 나란히 남는 것이
 "임상의가 최종 결정권자"라는 규제 서사를 가장 직접적으로 증명한다.
 
+### 5.6-1 AI-CDSS 카드 구조 (5영역 고정)
+
+카드를 위에서 아래로 **5개 영역**으로 고정한다. 라벨과 값이 세로로 나열된 "문서"가 아니라
+칸으로 스캔되는 "UI"가 되어야 한다.
+
+```
+┌ A. 결론 블록 (고정 높이) — 상태 라벨 + 권고 헤드라인
+├ B. CURRENT                 ← 1
+├ C. PREDICTED · 15 MIN      ← 1
+├ D. TIME TO THRESHOLD       ← 1
+├ E. 동적 블록                ← 2
+└ 액션 푸터 (고정 64px) — 안전성 뱃지 + 3버튼 / 승인 상태 + 감사추적
+```
+
+- **B : C : D : E = 1 : 1 : 1 : 2.** 이 비율은 다섯 단계 모두에서 같다.
+  액션 푸터도 내용이 없는 단계에서 자리를 비워 둔 채 높이를 유지한다 —
+  그래야 비율뿐 아니라 **각 영역의 절대 높이까지** 단계 전환에서 흔들리지 않는다.
+  (실측 1440×900: 37 / 37 / 37 / 74, 다섯 단계 동일)
+- 그리드는 `absolute inset-0`으로 띄운다. 행의 내재 높이가 카드 높이를 밀어 올리면
+  행 높이 일치(5.1절)가 깨지기 때문이다. 넘치는 내용은 각 행에서 잘린다.
+
+**B / C / D 행**
+- 가로 2분할: 좌측 라벨(uppercase, `--text-label`) / 우측 값. 세 행의 값 우측 끝선이 정렬된다.
+- 값은 행의 주인공이다(30px). 단위 접미사(`/ 10`)는 값의 절반 크기에 `--text-muted`.
+- **CURRENT·PREDICTED에는 게이지와 같은 밴드 색**을 쓴다(5.5-2절). 같은 값에 다른 색이 나오면 안 된다.
+- **TIME TO THRESHOLD는 밴드 색 대상이 아니다.** 시간은 Pain Score 스케일이 아니므로
+  `No breach predicted`도 `12 min`도 `--text-primary`를 쓴다.
+- 색 판정은 jitter 미적용 기준값으로 한다.
+
+**E 동적 블록**
+- `idle` / `recovered`: 라벨 `RECOMMENDATION` + 한 줄 문장. 상단 정렬하고 아래는 비워 둔다.
+  문장을 늘려 채우지 않는다.
+- `warning` / `recommendation` / `administering`: 아래 구조화 그리드(1:1)로 채운다.
+
+### 5.6-2 Signal change — 줄글이 아니라 셀
+
+경고 단계의 rationale을 서술형 문장에서 **라벨 + 값 셀**로 바꿨다. 읽는 것이 아니라 스캔한다.
+
+- 상단 `SIGNAL CHANGE`: 변화한 생체신호를 셀(chip)로 분해한다. 한 셀 = 지표명 + 변화량 + 방향 기호.
+  **최대 4개.** 방향은 `▲▼` 기호가 먼저 읽히고 색은 보조다(색각이상 고려).
+- 하단 `NEXT ACTION`: 임상의가 다음에 할 행동 한 줄. 좌측 라벨 / 우측 값.
+- 두 영역은 수평 구분선으로 1:1로 나눈다.
+
+**데이터 구조 (`src/data/phases.js`)**
+
+```js
+signalChangeFor(phase)  // [{ label, delta, dir }] — 최대 4개
+NEXT_ACTION[phase]      // 한 줄 문장
+```
+
+- **변화량은 지어내지 않는다.** 각 단계 `vitals`와 `idle` 기준선의 차이에서 계산한다.
+  (예: `warning`의 HR 88 − idle 72 = `+16 bpm ▲`)
+- PPG 진폭은 수치 데이터가 없으므로 방향만 표시한다(`PPG amp shift ▼`).
+- 기존 서술형 문자열의 분해 대조는 아래와 같다.
+
+| 원문 | 분해 결과 | 비고 |
+|---|---|---|
+| `EEG arousal burst` | `BIS +9 ▲` (warning) | BIS는 EEG 유도 지표다. 수치는 vitals에서 계산 |
+| `ECG rate variability` | `HR +16 bpm ▲` | 수치는 vitals에서 계산 |
+| `PPG amplitude shift` | `PPG amp shift ▼` | 수치 데이터 없음 — 방향만 |
+| (vitals에서 추가) | `RR +4 ▲` | 호흡수 변화도 같은 방식으로 노출 |
+| `CDSS medication recommendation pending validation` | `NEXT ACTION` 값 | 그대로 유지 |
+| `Intraoperative opioid offset · propofol provides sedation without analgesia` | **카드에서 제외** | 아래 참조 |
+
+**버린 정보**: `recommendation` 단계 rationale의 앞부분
+"Intraoperative opioid offset · propofol provides sedation without analgesia"는
+셀로 분해되지 않는 **서술형 임상 근거**라 카드에서 뺐다. Trigger 문장
+(`Predicted Pain Score(CPI) ≥ 4.0 within 15 min`)도 B/C/D 행이 같은 내용을 수치로 보여주므로 제외했다.
+이 문장을 화면에 되살리려면 E 블록에 세 번째 영역이 필요하고 1:1:1:2 비율을 깨야 한다.
+
 ### 5.7 EMR Context — 모델 입력원으로 재포지셔닝
 
 **이 카드의 역할이 v1과 달라진다.** v1의 EMR은 우측 최하단의 정적 정보 카드였다.

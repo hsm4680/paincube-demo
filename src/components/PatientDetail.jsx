@@ -21,7 +21,7 @@ export default function PatientDetail({ phase, metrics, trend, approvalState, do
 
       {/* 행 단위 높이 일치 — 좌우 카드의 상단선과 하단선이 모두 맞는다 (PRD 5.1) */}
       <div className="grid min-h-0 flex-[26] items-stretch gap-3 xl:grid-cols-[1.4fr_1fr]">
-        <TrendChart trend={trend} metrics={metrics} />
+        <TrendChart trend={trend} metrics={metrics} live={live} />
         <PainGauge metrics={metrics} live={live} />
       </div>
 

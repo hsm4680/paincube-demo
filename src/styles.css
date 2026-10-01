@@ -170,7 +170,7 @@ button {
   }
 
   .cdss-headline {
-    font-size: clamp(23px, 3cqw, 34px);
+    font-size: clamp(21px, 2.7cqw, 31px);
     font-weight: 700;
     letter-spacing: -0.015em;
     line-height: 1.2;
@@ -200,13 +200,59 @@ button {
   }
 
   .cdss-meta {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.04em;
   }
 
   /* CDSS 필드 셀 — 지표는 문장이 아니라 칸으로 읽혀야 한다.
      라벨은 상단 좌측, 값은 그 아래. 모든 셀에서 두 baseline이 수평으로 맞는다. */
+  /* B/C/D 행 — 한 행을 통째로 쓰므로 값이 행의 주인공이다 (현재 대비 150%) */
+  .cdss-row-value {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cdss-row-value-sm {
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 단위 접미사는 숫자의 절반 수준 */
+  .cdss-row-unit {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* SIGNAL CHANGE 셀 — 문장이 아니라 칩으로 스캔된다. 방향은 색이 아니라 기호가 먼저다. */
+  .signal-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    padding: 1px 6px;
+    border: 1px solid var(--cdss-border);
+    border-radius: var(--radius-control);
+    background: var(--card-surface);
+    font-size: 12px;
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+
+  .cdss-next-action {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: right;
+  }
+
   .cdss-fields {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -244,7 +290,7 @@ button {
   }
 
   .forecast-value {
-    font-size: clamp(26px, 36cqw, 70px);
+    font-size: clamp(20px, 26cqw, 52px);
     font-weight: 800;
     letter-spacing: -0.03em;
     line-height: 1;

@@ -106,6 +106,32 @@ export const metricsForPatient = (patient) => ({
   }
 });
 
+// AI-CDSS E 블록 데이터 (PRD 5.6).
+// 서술형 rationale 문자열을 셀로 분해한 것이다. 수치는 지어내지 않고 각 단계 vitals와
+// idle 기준선의 차이에서 계산한다. PPG 진폭은 수치 데이터가 없어 방향만 표시한다.
+const SIGNAL_SOURCES = [
+  { key: "hr", label: "HR", unit: " bpm" },
+  { key: "bis", label: "BIS", unit: "" },
+  { key: "rr", label: "RR", unit: "" }
+];
+
+export const signalChangeFor = (phase) => {
+  const base = PHASES.idle.vitals;
+  const now = PHASES[phase].vitals;
+  const cells = SIGNAL_SOURCES.map(({ key, label, unit }) => {
+    const delta = now[key] - base[key];
+    return { label, delta: `${delta > 0 ? "+" : ""}${delta}${unit}`, dir: delta > 0 ? "up" : delta < 0 ? "down" : "flat" };
+  }).filter((c) => c.dir !== "flat");
+  // "PPG amplitude shift" — 수치가 없으므로 방향만 (최대 4셀, PRD 5.6)
+  return [...cells, { label: "PPG amp", delta: "shift", dir: "down" }].slice(0, 4);
+};
+
+export const NEXT_ACTION = {
+  warning: "CDSS medication recommendation pending validation",
+  recommendation: "Approve preemptive bolus",
+  administering: "Tracking medication response"
+};
+
 // 권고 약물 — 이 하나만 쓴다 (CLAUDE.md 10절)
 export const RECOMMENDATION = {
   drug: "Fentanyl",
