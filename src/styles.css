@@ -35,6 +35,11 @@
   --monitor-ink-dim: rgba(255, 255, 255, 0.45);
   --monitor-alert: #f5a03c; /* 모니터 내부 임계 초과 값, ▲ 동반 */
 
+  /* AI-CDSS 영역 표면 — 상태색이 아니라 "이 영역이 AI 판단 영역"이라는 표시다.
+     환자 상태와 무관하므로 "색은 ACTION REQUIRED에만" 규칙과 충돌하지 않는다. */
+  --cdss-surface: #fdf8ec;
+  --cdss-border: #f0e4c8;
+
   /* 추세 그래프 */
   --chart-observed: #1c3f7c;
   --chart-now: #8a93a6;
@@ -138,6 +143,46 @@ button {
     border-left: 1px solid var(--hairline);
   }
 
+  /* Pain Forecast 카드 — 두 게이지와 Time to Threshold를 같은 비중으로 */
+  .forecast-cell {
+    container-type: inline-size;
+  }
+
+  .forecast-dial {
+    width: clamp(72px, 62cqw, 132px);
+  }
+
+  .forecast-value {
+    font-size: clamp(20px, 17cqw, 38px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 숫자가 아니라 문구일 때는 한 단계 낮춘다 (No breach) */
+  .forecast-value-text {
+    font-size: clamp(15px, 11cqw, 26px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    text-align: center;
+  }
+
+  .forecast-sub {
+    font-size: clamp(10px, 7cqw, 15px);
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .forecast-label {
+    font-size: clamp(9px, 5cqw, 12px);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text-label);
+    line-height: 1.2;
+  }
+
   /* 상세 화면의 주인공 숫자도 같은 원리로 컨테이너 폭에 연동한다 */
   .kpi-cell {
     container-type: inline-size;
@@ -183,7 +228,7 @@ button {
 
   .monitor-bar-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
   }
 
   /* AI status는 문장이라 두 칸을 쓴다. 칸이 하나뿐인 폭에서는 자동으로 한 칸이 된다. */

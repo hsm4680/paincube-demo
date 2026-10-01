@@ -82,6 +82,9 @@
   --monitor-grid  rgba(255,255,255,0.055)
 
 차트 계층
+  --cdss-surface  #FDF8EC   AI-CDSS 카드 표면 (영역 표시이지 상태색이 아니다)
+  --cdss-border   #F0E4C8
+
   --chart-observed  #1C3F7C
   --chart-now       #8A93A6
   --chart-grid      #E3E9F2
@@ -108,6 +111,11 @@
 - **`--brand-light` (#77A0D5)를 상태색·데이터색으로 쓰지 말 것.**
   시안 계열 상태색과 구분도 ΔE 10.7로 실패한다. 구조·액센트 전용이다.
 - **상태를 색상만으로 전달하지 말 것.** 항상 아이콘 + 텍스트를 함께 둔다.
+- **`--cdss-surface` / `--cdss-border`는 상태 계층이 아니라 표면 계층이다.**
+  "이 영역이 AI 판단 영역"이라는 표시일 뿐 환자 상태와 무관하다. 그래서 아래의
+  "색은 ACTION REQUIRED에만" 규칙과 충돌하지 않는다. 채도를 올리지 마라 —
+  쨍한 노랑은 임상 소프트웨어에서 경보로 오인된다.
+  AI-CDSS 카드는 평상시 이 표면을 쓰고, `recommendation` 단계에서만 critical 틴트로 바뀐다.
 - **상태어에 색은 `ACTION REQUIRED`에만 붙인다.** `STABLE` / `RISING` / `TREATING` /
   `STABILIZED`는 중성 회색이다(PRD 2.5). 전체 흐름에서 빨강이 권고 시점에 한 번만 떠야 한다.
 - **현재값·예측값을 그리는 요소의 색은 목표값 4.0 하나로만 갈라진다**(PRD 5.4-1).

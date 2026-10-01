@@ -60,7 +60,7 @@ export default function WardDashboard({ heroMetrics, onOpenPatient, resetKey }) 
   // 2행 이하면 남는 세로 공간을 카드 높이가 흡수한다. 3행 이상은 고정 높이 + 페이지 스크롤.
   const fills = rows <= 2;
   const minHeight = rows * MIN_CARD_H + (rows - 1) * GAP;
-  const gridHeight = fills ? `max(${minHeight}px, calc(100vh - 154px))` : rows * CARD_H_SM + (rows - 1) * GAP;
+  const gridHeight = fills ? `max(${minHeight}px, calc(100vh - 134px))` : rows * CARD_H_SM + (rows - 1) * GAP;
   const cardHeight = fills ? `calc((100% - ${(rows - 1) * GAP}px) / ${rows})` : CARD_H_SM;
 
   const cards = useMemo(() => {

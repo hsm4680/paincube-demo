@@ -29,6 +29,8 @@ const tokens = [
   "monitor-ink",
   "monitor-ink-dim",
   "monitor-alert",
+  "cdss-surface",
+  "cdss-border",
   "chart-observed",
   "chart-now",
   "chart-grid"

@@ -1,83 +1,97 @@
 import React from "react";
-import { BASELINE_WINDOW_H, HORIZON_MIN, SCALE_MAX, THRESHOLD } from "../data/phases.js";
+import { BASELINE_WINDOW_H, HORIZON_MIN, SCALE_MAX, THRESHOLD, formatTimeToThreshold } from "../data/phases.js";
 
-// 게이지 카드 160px. Predicted / Time to Threshold 줄과 상태 배지는 KPI·상태어와 중복이라 뺐다.
-// 링 구조 (PRD 5.5): 현재값은 실선 호, 현재값 끝점에서 예측값까지는 점선 확장 호 + 화살표.
-// 두 호를 이어 그린다. v1처럼 같은 반지름에 겹쳐 그려 덮이게 하지 않는다.
-// 색 판정은 막대와 같은 규칙이다 — 목표값 4.0 하나로만 갈라지고, 실선 호는 현재값,
-// 점선 호는 예측값으로 판정한다. 화면 단계 상태는 상태어 배지가 이미 전달한다.
+// Pain Forecast 카드 — 현재값·예측값을 각각 독립된 원형 게이지로, 세 번째 칸에 Time to Threshold.
+// 하나의 호에 두 값을 겹쳐 그리던 방식(실선 + 점선 확장)은 버렸다. 두 값은 대등하다.
+// 각 게이지는 자기 값으로 색을 판정한다 — 4.0 이상이면 critical, 미만이면 중성 (PRD 5.4-1).
 const CX = 60;
 const CY = 60;
 const R = 46;
 
 const angleOf = (v) => (-90 + (v / SCALE_MAX) * 360) * (Math.PI / 180);
-const point = (v) => [CX + R * Math.cos(angleOf(v)), CY + R * Math.sin(angleOf(v))];
+const polar = (v, r) => [CX + r * Math.cos(angleOf(v)), CY + r * Math.sin(angleOf(v))];
 const fmt = ([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`;
 
 const arc = (from, to) => {
   if (Math.abs(to - from) < 0.01) return "";
-  const sweep = to > from ? 1 : 0;
   const largeArc = Math.abs(to - from) / SCALE_MAX > 0.5 ? 1 : 0;
-  return `M${fmt(point(from))} A${R},${R} 0 ${largeArc} ${sweep} ${fmt(point(to))}`;
-};
-
-// 확장 호 끝의 화살촉 — 진행 방향(접선)을 향한다
-const arrowHead = (at, forward) => {
-  const a = angleOf(at);
-  const tangent = a + (forward ? Math.PI / 2 : -Math.PI / 2);
-  const base = [CX + R * Math.cos(a), CY + R * Math.sin(a)];
-  const tip = [base[0] + 8 * Math.cos(tangent), base[1] + 8 * Math.sin(tangent)];
-  const left = [base[0] + 5 * Math.cos(a), base[1] + 5 * Math.sin(a)];
-  const right = [base[0] - 5 * Math.cos(a), base[1] - 5 * Math.sin(a)];
-  return `${fmt(tip)} ${fmt(left)} ${fmt(right)}`;
+  return `M${fmt(polar(from, R))} A${R},${R} 0 ${largeArc} ${to > from ? 1 : 0} ${fmt(polar(to, R))}`;
 };
 
 export default function PainGauge({ metrics }) {
-  const currentStroke = metrics.painScore >= THRESHOLD ? "stroke-status-critical" : "stroke-text-muted";
-  const forecastStroke = metrics.predicted >= THRESHOLD ? "stroke-status-critical" : "stroke-text-muted";
-  const forward = metrics.predicted >= metrics.painScore;
+  const noBreach = metrics.timeToThreshold == null;
 
   return (
-    <section className="panel flex min-h-[160px] shrink-0 flex-col">
+    <section className="panel flex h-full flex-col">
       <div className="section-head">Pain forecast</div>
 
-      <div className="gauge-box flex flex-1 items-center gap-4 px-4">
-        <div className="gauge-dial relative aspect-square shrink-0">
-          <svg
-            viewBox="0 0 120 120"
-            role="img"
-            aria-label={`Pain Score(CPI) ${metrics.painScore.toFixed(1)} of ${SCALE_MAX}, predicted ${metrics.predicted.toFixed(1)} in ${HORIZON_MIN} min`}
-          >
-            <circle cx={CX} cy={CY} r={R} fill="none" className="stroke-hairline" strokeWidth="9" />
-            <path d={arc(0, metrics.painScore)} fill="none" className={currentStroke} strokeWidth="9" />
-            <path
-              d={arc(metrics.painScore, metrics.predicted)}
-              fill="none"
-              className={forecastStroke}
-              strokeWidth="5"
-              strokeDasharray="4 4"
-            />
-            <polygon points={arrowHead(metrics.predicted, forward)} className={`${forecastStroke} fill-current`} />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className="gauge-value">{metrics.painScore.toFixed(1)}</div>
-            <div className="t-caption mt-0.5">{`/ ${SCALE_MAX}`}</div>
-          </div>
+      <div className="flex min-h-0 flex-1 flex-col px-3 py-2">
+        <div className="grid flex-1 grid-cols-3">
+          <Dial value={metrics.painScore} label="Current Pain Score" />
+          <Dial value={metrics.predicted} label={`Predicted · ${HORIZON_MIN} min`} divided />
+          <Figure
+            primary={noBreach ? "No breach" : `${metrics.timeToThreshold}`}
+            secondary={noBreach ? "predicted" : "min"}
+            label="Time to Threshold"
+            breach={!noBreach}
+            text={noBreach}
+          />
         </div>
 
-        <div className="min-w-0 flex-1">
-          <div className="t-label">Pain Score(CPI)</div>
-          <div className="t-value mt-0.5">{metrics.aiStatus}</div>
-          <div className="mt-2 flex items-baseline justify-between gap-2 border-t border-hairline pt-1.5">
-            <span className="t-label">Target</span>
-            <span className="t-value">{`Pain Score < ${THRESHOLD.toFixed(1)}`}</span>
-          </div>
-          <div className="mt-1 flex items-baseline justify-between gap-2 border-t border-hairline pt-1.5">
-            <span className="t-label">Personal baseline</span>
-            <span className="t-value">{`${BASELINE_WINDOW_H}h adaptive`}</span>
-          </div>
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-t border-hairline pt-1.5">
+          <span className="t-caption">
+            <span className="font-semibold uppercase tracking-[0.06em]">Target</span>
+            {` · Pain Score < ${THRESHOLD.toFixed(1)}`}
+          </span>
+          <span className="t-caption">
+            <span className="font-semibold uppercase tracking-[0.06em]">Personal baseline</span>
+            {` · ${BASELINE_WINDOW_H}h adaptive`}
+          </span>
         </div>
       </div>
     </section>
+  );
+}
+
+function Dial({ value, label, divided = false }) {
+  const breach = value >= THRESHOLD;
+  const stroke = breach ? "stroke-status-critical" : "stroke-text-muted";
+  const [tickInner, tickOuter] = [polar(THRESHOLD, R - 9), polar(THRESHOLD, R + 9)];
+
+  return (
+    <div className={`forecast-cell flex min-w-0 flex-col items-center justify-center gap-1 px-2 ${divided ? "rule-l" : ""}`}>
+      <div className="forecast-dial relative aspect-square">
+        <svg viewBox="0 0 120 120" role="img" aria-label={`${label} ${value.toFixed(1)} of ${SCALE_MAX}`}>
+          <circle cx={CX} cy={CY} r={R} fill="none" className="stroke-hairline" strokeWidth="9" />
+          <path d={arc(0, value)} fill="none" className={stroke} strokeWidth="9" />
+          {/* 목표 4.0 눈금 */}
+          <line
+            x1={tickInner[0]}
+            y1={tickInner[1]}
+            x2={tickOuter[0]}
+            y2={tickOuter[1]}
+            className="stroke-text-primary"
+            strokeWidth="2"
+          />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className={`forecast-value ${breach ? "text-status-critical" : "text-text-primary"}`}>{value.toFixed(1)}</span>
+        </div>
+      </div>
+      <div className="forecast-label text-center">{label}</div>
+    </div>
+  );
+}
+
+// Time to Threshold는 시각화하지 않는다. 수치만 게이지 숫자와 비슷한 비중으로 둔다.
+function Figure({ primary, secondary, label, breach, text = false }) {
+  return (
+    <div className="forecast-cell rule-l flex min-w-0 flex-col items-center justify-center gap-1 px-2">
+      <div className="flex flex-col items-center">
+        <span className={`${text ? "forecast-value-text" : "forecast-value"} ${breach ? "text-status-critical" : "text-text-primary"}`}>{primary}</span>
+        <span className="forecast-sub">{secondary}</span>
+      </div>
+      <div className="forecast-label text-center">{label}</div>
+    </div>
   );
 }

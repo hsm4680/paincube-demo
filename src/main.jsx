@@ -107,7 +107,7 @@ function App() {
 
   return (
     <main className="min-h-screen bg-page-bg text-text-primary">
-      <div className="mx-auto flex min-h-screen max-w-[2400px] flex-col gap-4 px-3 py-3 sm:px-6 lg:h-screen lg:overflow-y-auto">
+      <div className="mx-auto flex min-h-screen max-w-[2400px] flex-col gap-3 px-3 py-3 sm:px-6 lg:h-screen lg:overflow-y-auto">
         <Header
           patient={onDetail ? patient : null}
           onStart={startDemo}

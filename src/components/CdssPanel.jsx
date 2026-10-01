@@ -23,7 +23,7 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
   };
 
   return (
-    <section className="panel relative flex min-h-[265px] flex-1 flex-col">
+    <section className="panel relative flex h-full min-h-0 flex-col border-cdss-border bg-cdss-surface">
       <div className="section-head justify-between">
         <span className="flex items-center gap-2">
           <FileCheck2 className="h-3.5 w-3.5" />
@@ -33,14 +33,14 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
       </div>
 
       {dismissed ? (
-        <div className="flex flex-1 items-center justify-center px-4 text-[13px] font-semibold text-text-label">
+        <div className="flex min-h-0 flex-1 items-center justify-center px-4 text-[13px] font-semibold text-text-label">
           Recommendation dismissed
         </div>
       ) : (
-        <div className={`flex min-h-0 flex-1 flex-col p-2.5 ${quiet ? "" : tone.tint}`}>
+        <div className={`flex min-h-0 flex-1 flex-col p-2.5 ${quiet ? "" : `${tone.tint} rounded-[var(--radius-control)]`}`}>
           <Headline phase={phase} tone={tone} quiet={quiet} recommendation={recommendation} metrics={metrics} />
 
-          <div className="mt-1.5 grid min-h-0 flex-1 content-start gap-1">
+          <div className="mt-1.5 grid min-h-0 flex-1 content-evenly gap-1">
             {phase === "idle" && (
               <>
                 <Fact label="Pain Score(CPI)" value={painFact} />
@@ -64,9 +64,9 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
           </div>
 
           {phase === "recommendation" && !approved && (
-            <div className="mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-status-stable">
+            <div className="mt-1.5 flex items-start gap-1.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-status-stable">
               <Check className="h-3.5 w-3.5 shrink-0" />
-              <span className="truncate">
+              <span className="min-w-0">
                 {`Safety check passed — RR ${safetyVitals.rr} · SpO₂ ${safetyVitals.spo2}% · No opioid in past ${SAFETY.opioidFreeHours} h`}
               </span>
             </div>
@@ -111,7 +111,7 @@ function Headline({ phase, tone, quiet, recommendation, metrics }) {
 
   return (
     <div className="flex items-center gap-2.5">
-      <span className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-[var(--radius-control)] ${quiet ? "bg-page-bg text-text-label" : `bg-card-surface ${tone.text}`}`}>
+      <span className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-[var(--radius-control)] ${quiet ? "bg-white/70 text-text-label" : `bg-card-surface ${tone.text}`}`}>
         <copy.Icon className="h-4 w-4" />
       </span>
       <div className="min-w-0">
