@@ -3,6 +3,8 @@
 export const THRESHOLD = 4.0; // Pain Score(CPI) 통증 관리 목표값 (PRD 2.3).
 // 0–10 척도에서 4점이 "임상적으로 유의미한 통증"의 표준 컷오프다.
 // ICU 통증 관리 프로토콜은 Pain Score < 4 유지를 목표로 잡는다.
+// 게이지 밴드 상단 경계 — 임상 NRS 표준(1–3 mild / 4–6 moderate / 7–10 severe)
+export const SEVERE = 7.0;
 export const HORIZON_MIN = 15; // 예측 지평, 분 (PRD 2.2)
 export const SCALE_MAX = 10; // Pain Score(CPI) 척도 상한 (0–10)
 export const BASELINE_WINDOW_H = 24; // Personal baseline 산출 창, 시간 (PRD 2.2)

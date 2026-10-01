@@ -4,10 +4,12 @@ import { STATUS_CLASS } from "./status.js";
 import { AUDIT, DOSE_OPTIONS, HORIZON_MIN, PHASES, RECOMMENDATION, SAFETY, SCALE_MAX, THRESHOLD, formatTimeToThreshold } from "../data/phases.js";
 
 // AI-CDSS 카드 265px (게이지 160 + CDSS 265 = 좌측 열과 같은 425). 모든 수치는 PHASES·RECOMMENDATION에서 읽는다.
-export default function CdssPanel({ phase, metrics, approvalState, dose, dismissed, onApprove, onDismiss, onModify }) {
+export default function CdssPanel({ phase, metrics, live, approvalState, dose, dismissed, onApprove, onDismiss, onModify }) {
   const [doseOpen, setDoseOpen] = useState(false);
   const tone = STATUS_CLASS[metrics.status.color];
-  const painFact = `${metrics.painScore.toFixed(1)} / ${SCALE_MAX}, predicted ${metrics.predicted.toFixed(1)} in ${HORIZON_MIN} min`;
+  // 한 화면 안에서 같은 지표가 다른 숫자로 보이면 안 된다 — 게이지·모니터와 같은 표시값을 쓴다.
+  // 임계·색 판정은 기존대로 기준값(metrics)으로 한다.
+  const shown = live ?? metrics;
   const recommendation = `${RECOMMENDATION.drug} ${RECOMMENDATION.dose} ${RECOMMENDATION.unit} ${RECOMMENDATION.route}`;
   const approved = approvalState !== "ready";
   const showActions = phase === "recommendation" && !dismissed && !approved;
@@ -33,62 +35,75 @@ export default function CdssPanel({ phase, metrics, approvalState, dose, dismiss
       </div>
 
       {dismissed ? (
-        <div className="flex min-h-0 flex-1 items-center justify-center px-4 text-[18px] font-semibold text-text-label">
+        <div className="flex min-h-0 flex-1 items-center justify-center px-4 text-[15px] font-semibold text-text-label">
           Recommendation dismissed
         </div>
       ) : (
-        <div className={`flex min-h-0 flex-1 flex-col p-3 ${quiet ? "" : `${tone.tint} rounded-[var(--radius-control)]`}`}>
-          <Headline phase={phase} tone={tone} quiet={quiet} recommendation={recommendation} metrics={metrics} />
+        <div className="flex min-h-0 flex-1 flex-col">
+          {/* 1) 결론 블록 — 이 카드의 결론. 아래 근거와 단차로 끊는다. */}
+          <div className={`px-3 py-0.5 ${quiet ? "" : tone.tint}`}>
+            <Headline phase={phase} tone={tone} quiet={quiet} recommendation={recommendation} metrics={metrics} />
+          </div>
 
-          <div className="mt-2 grid min-h-0 flex-1 content-evenly gap-1 overflow-hidden">
+          {/* 2) 필드 그리드 — 지표는 각자 자기 칸을 갖는다 */}
+          <div className="cdss-fields border-y border-cdss-border">
+            <Field label="Current" value={shown.painScore.toFixed(1)} unit={`/ ${SCALE_MAX}`} />
+            <Field label={`Predicted · ${HORIZON_MIN} min`} value={shown.predicted.toFixed(1)} unit={`/ ${SCALE_MAX}`} divided />
+            <Field label="Time to Threshold" value={formatTimeToThreshold(metrics.timeToThreshold)} divided />
+          </div>
+
+          {/* 3) 서술 블록 */}
+          <div className="flex min-h-0 flex-1 flex-col justify-center gap-1 overflow-hidden px-3 py-1">
             {phase === "idle" && (
-              <>
-                <Fact label="Pain Score(CPI)" value={painFact} />
-                <Fact label="Time to Threshold" value={formatTimeToThreshold(metrics.timeToThreshold)} />
-                <Fact label="Recommendation" value="Continue monitoring; no opioid bolus indicated now" />
-              </>
+              <Narrative label="Recommendation" value="Continue monitoring; no opioid bolus indicated now" />
             )}
             {phase === "warning" && (
               <>
-                <Fact label="Pain Score(CPI)" value={painFact} />
-                <Fact label="Signal change" value="EEG arousal burst + ECG rate variability + PPG amplitude shift" />
-                <Fact label="Next action" value="CDSS medication recommendation pending validation" />
+                <Narrative label="Signal change" value="EEG arousal burst + ECG rate variability + PPG amplitude shift" />
+                <Narrative label="Next action" value="CDSS medication recommendation pending validation" />
               </>
             )}
             {(phase === "recommendation" || phase === "administering" || phase === "recovered") && (
               <>
-                <Fact label="Trigger" value={`Predicted Pain Score(CPI) ≥ ${THRESHOLD.toFixed(1)} within ${HORIZON_MIN} min`} />
-                <Fact label="Rationale" value="Intraoperative opioid offset · propofol provides sedation without analgesia · EEG arousal + ECG/PPG sympathetic shift" />
+                <Narrative label="Trigger" value={`Predicted Pain Score(CPI) ≥ ${THRESHOLD.toFixed(1)} within ${HORIZON_MIN} min`} />
+                <Narrative label="Rationale" value="Intraoperative opioid offset · propofol provides sedation without analgesia · EEG arousal + ECG/PPG sympathetic shift" />
               </>
             )}
           </div>
 
-          {phase === "recommendation" && !approved && (
-            <div className="cdss-meta mt-2 flex items-start gap-2 uppercase text-status-stable">
-              <Check className="mt-0.5 h-5 w-5 shrink-0" />
-              <span className="min-w-0">
-                {`Safety check passed — RR ${safetyVitals.rr} · SpO₂ ${safetyVitals.spo2}% · No opioid in past ${SAFETY.opioidFreeHours} h`}
-              </span>
-            </div>
-          )}
-
-          {showActions && (
-            <div className="mt-2 grid grid-cols-3 gap-2">
-              <ActionButton onClick={onDismiss} variant="ghost">Dismiss</ActionButton>
-              <ActionButton onClick={() => setDoseOpen(true)} variant="ghost">Modify</ActionButton>
-              <ActionButton onClick={onApprove} variant="primary">Approve</ActionButton>
-            </div>
-          )}
-
-          {approved && (
-            <div className="mt-1.5">
-              <div className="flex h-11 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-brand-navy text-[15px] font-semibold text-white" role="status" aria-live="polite" aria-busy={approvalState === "loading"}>
-                {approvalState === "loading" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
-                {approvalState === "loading" ? "Approving order" : "Administration complete"}
+          <div className="px-3 pb-1.5">
+            {phase === "recommendation" && !approved && (
+              <div className="cdss-meta mb-1 flex items-start gap-2 uppercase text-status-stable">
+                <Check className="mt-0.5 h-4 w-4 shrink-0" />
+                <span className="min-w-0">
+                  {`Safety check passed — RR ${safetyVitals.rr} · SpO₂ ${safetyVitals.spo2}% · No opioid in past ${SAFETY.opioidFreeHours} h`}
+                </span>
               </div>
-              {approvalState === "done" && <AuditTrail dose={dose} />}
-            </div>
-          )}
+            )}
+
+            {showActions && (
+              <div className="grid grid-cols-3 gap-2">
+                <ActionButton onClick={onDismiss} variant="ghost">Dismiss</ActionButton>
+                <ActionButton onClick={() => setDoseOpen(true)} variant="ghost">Modify</ActionButton>
+                <ActionButton onClick={onApprove} variant="primary">Approve</ActionButton>
+              </div>
+            )}
+
+            {approved && (
+              <div>
+                <div
+                  className="flex h-9 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-brand-navy text-[14px] font-semibold text-white"
+                  role="status"
+                  aria-live="polite"
+                  aria-busy={approvalState === "loading"}
+                >
+                  {approvalState === "loading" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                  {approvalState === "loading" ? "Approving order" : "Administration complete"}
+                </div>
+                {approvalState === "done" && <AuditTrail dose={dose} />}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -122,9 +137,21 @@ function Headline({ phase, tone, quiet, recommendation, metrics }) {
   );
 }
 
-function Fact({ label, value }) {
+function Field({ label, value, unit, divided = false, className = "" }) {
   return (
-    <div className="border-t border-hairline pt-2">
+    <div className={`cdss-field ${divided ? "border-l border-cdss-border" : ""} ${className}`}>
+      <span className="cdss-label truncate">{label}</span>
+      <span className="flex items-baseline gap-1.5">
+        <span className="cdss-field-value">{value}</span>
+        {unit && <span className="cdss-field-unit">{unit}</span>}
+      </span>
+    </div>
+  );
+}
+
+function Narrative({ label, value }) {
+  return (
+    <div>
       <div className="cdss-label">{label}</div>
       <div className="cdss-body">{value}</div>
     </div>
@@ -140,7 +167,7 @@ function ActionButton({ children, onClick, variant }) {
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex h-11 items-center justify-center rounded-[var(--radius-control)] text-[15px] font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel ${style}`}
+      className={`inline-flex h-10 items-center justify-center rounded-[var(--radius-control)] text-[14px] font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-panel ${style}`}
     >
       {children}
     </button>
@@ -181,5 +208,5 @@ function AuditTrail({ dose }) {
   const text = modified
     ? `${AUDIT.approvedAt} · Approved by ${AUDIT.clinician} (ID ${AUDIT.clinicianId}) · Recommended ${RECOMMENDATION.dose} ${RECOMMENDATION.unit} · Administered ${dose} ${RECOMMENDATION.unit} (modified)`
     : `${AUDIT.approvedAt} · Approved by ${AUDIT.clinician} (ID ${AUDIT.clinicianId}) · Sent to EMR — Ack ${AUDIT.ackAt}`;
-  return <div className="mt-2 text-[12px] text-text-muted" title={text}>{text}</div>;
+  return <div className="mt-1 text-[12px] text-text-muted" title={text}>{text}</div>;
 }

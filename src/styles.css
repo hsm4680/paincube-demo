@@ -170,7 +170,7 @@ button {
   }
 
   .cdss-headline {
-    font-size: clamp(27px, 3.5cqw, 40px);
+    font-size: clamp(23px, 3cqw, 34px);
     font-weight: 700;
     letter-spacing: -0.015em;
     line-height: 1.2;
@@ -178,14 +178,14 @@ button {
   }
 
   .cdss-kicker {
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
   .cdss-label {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -193,16 +193,45 @@ button {
   }
 
   .cdss-body {
-    font-size: 21px;
+    font-size: 18px;
     font-weight: 500;
-    line-height: 1.38;
+    line-height: 1.22;
     color: var(--text-primary);
   }
 
   .cdss-meta {
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 600;
     letter-spacing: 0.04em;
+  }
+
+  /* CDSS 필드 셀 — 지표는 문장이 아니라 칸으로 읽혀야 한다.
+     라벨은 상단 좌측, 값은 그 아래. 모든 셀에서 두 baseline이 수평으로 맞는다. */
+  .cdss-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .cdss-field {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 3px 12px;
+    min-width: 0;
+  }
+
+  .cdss-field-value {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.1;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cdss-field-unit {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
   }
 
   /* Pain Forecast 카드 — 두 게이지와 Time to Threshold를 같은 비중으로 */
@@ -211,11 +240,11 @@ button {
   }
 
   .forecast-dial {
-    width: clamp(60px, 48cqw, 104px);
+    width: clamp(84px, 90cqw, 184px);
   }
 
   .forecast-value {
-    font-size: clamp(19px, 15cqw, 34px);
+    font-size: clamp(26px, 36cqw, 70px);
     font-weight: 800;
     letter-spacing: -0.03em;
     line-height: 1;
@@ -224,7 +253,7 @@ button {
 
   /* 숫자가 아니라 문구일 때는 한 단계 낮춘다 (No breach) */
   .forecast-value-text {
-    font-size: clamp(15px, 11cqw, 26px);
+    font-size: clamp(18px, 16cqw, 34px);
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.1;
@@ -232,14 +261,14 @@ button {
   }
 
   .forecast-sub {
-    font-size: clamp(10px, 7cqw, 15px);
+    font-size: clamp(12px, 8.5cqw, 19px);
     font-weight: 600;
     color: var(--text-muted);
   }
 
   /* 라벨은 게이지 위에 놓고 secondary 단계로 올린다 — 무슨 항목인지가 먼저 읽혀야 한다 */
   .forecast-label {
-    font-size: clamp(11px, 6.5cqw, 15px);
+    font-size: clamp(13px, 8cqw, 19px);
     font-weight: 600;
     letter-spacing: 0.01em;
     color: var(--text-label);
@@ -251,14 +280,14 @@ button {
   }
 
   .forecast-foot-label {
-    font-size: 12px;
+    font-size: 15px;
     font-weight: 600;
     letter-spacing: 0.02em;
     color: var(--text-label);
   }
 
   .forecast-foot-value {
-    font-size: 13px;
+    font-size: 17px;
     font-weight: 700;
     color: var(--text-primary);
     font-variant-numeric: tabular-nums;
