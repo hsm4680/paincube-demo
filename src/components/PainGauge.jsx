@@ -35,11 +35,11 @@ export default function PainGauge({ metrics, live }) {
   const ttt = timeToThresholdParts(metrics.timeToThreshold);
 
   return (
-    <section className="panel flex h-full w-full min-h-0 flex-col">
+    <section className="panel flex w-full flex-col xl:h-full xl:min-h-0">
       <div className="section-head">Pain forecast</div>
 
       <div className="flex min-h-0 flex-1 flex-col px-3 pb-2 pt-1.5">
-        <div className="grid flex-1 grid-cols-3">
+        <div className="grid flex-1 grid-cols-2 md:grid-cols-3">
           <Dial value={live ? live.painScore : metrics.painScore} base={metrics.painScore} label="Current Pain Score" />
           <Dial value={live ? live.predicted : metrics.predicted} base={metrics.predicted} label={`Predicted · ${HORIZON_MIN} min`} divided />
           <Figure
@@ -93,7 +93,7 @@ function Dial({ value, base, label, divided = false }) {
 // Time to Threshold는 시각화하지 않는다. 수치만 게이지 숫자와 비슷한 비중으로 둔다.
 function Figure({ primary, secondary, label, toneClass, text = false }) {
   return (
-    <div className="forecast-cell rule-l flex min-w-0 flex-col items-center justify-center gap-1.5 px-2">
+    <div className="forecast-cell col-span-2 flex min-w-0 flex-row items-center justify-between gap-3 border-t border-hairline px-3 py-2 md:col-span-1 md:flex-col md:justify-center md:gap-1.5 md:border-t-0 md:px-2 md:py-0 md:rule-l">
       <div className="forecast-label text-center">{label}</div>
       <div className="flex flex-col items-center">
         <span className={`${text ? "forecast-value-text" : "forecast-value"} ${toneClass}`}>{primary}</span>

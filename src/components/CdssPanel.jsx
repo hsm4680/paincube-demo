@@ -42,7 +42,7 @@ export default function CdssPanel({ phase, metrics, live, approvalState, dose, d
   };
 
   return (
-    <section className="cdss-card panel relative flex h-full min-h-[320px] w-full flex-col border-cdss-border bg-cdss-surface xl:min-h-0">
+    <section className="cdss-card panel relative flex w-full flex-col border-cdss-border bg-cdss-surface xl:h-full xl:min-h-0">
       <div className="section-head justify-between">
         <span className="flex items-center gap-2">
           <FileCheck2 className="h-4 w-4" />
@@ -65,8 +65,8 @@ export default function CdssPanel({ phase, metrics, live, approvalState, dose, d
           {/* B~E. 1:1:1:2 */}
           {/* 그리드의 내재 높이가 카드 높이를 밀어올리지 않도록 absolute로 띄운다.
               행 비율(1:1:1:2)은 단계와 무관하게 고정되고, 넘치는 내용은 각 행에서 잘린다. */}
-          <div className="relative min-h-0 flex-1">
-            <div className="absolute inset-0 grid grid-rows-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,2fr)]">
+          <div className="xl:relative xl:min-h-0 xl:flex-1">
+            <div className="grid xl:absolute xl:inset-0 xl:grid-rows-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,2fr)]">
             <MetricRow
               label="Current"
               value={shown.painScore.toFixed(1)}
@@ -86,9 +86,9 @@ export default function CdssPanel({ phase, metrics, live, approvalState, dose, d
           </div>
 
           {/* 액션 푸터 — 단계와 무관하게 높이를 유지한다 */}
-          <div className="flex h-[64px] shrink-0 flex-col justify-end px-3 pb-1.5">
+          <div className="flex shrink-0 flex-col justify-end px-3 pb-1.5 xl:h-[64px]">
             {phase === "recommendation" && !approved && (
-              <div className="cdss-meta mb-1 flex items-center gap-1.5 uppercase text-status-stable">
+              <div className="cdss-meta mb-1.5 flex items-start gap-1.5 border-t border-hairline pt-1.5 uppercase text-status-stable xl:mb-1 xl:items-center xl:border-t-0 xl:pt-0">
                 <Check className="h-4 w-4 shrink-0" />
                 <span className="min-w-0">
                   {`Safety check passed — RR ${safetyVitals.rr} · SpO₂ ${safetyVitals.spo2}% · No opioid in past ${SAFETY.opioidFreeHours} h`}
@@ -97,7 +97,7 @@ export default function CdssPanel({ phase, metrics, live, approvalState, dose, d
             )}
 
             {showActions && (
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                 <ActionButton onClick={onDismiss} variant="ghost">Dismiss</ActionButton>
                 <ActionButton onClick={() => setDoseOpen(true)} variant="ghost">Modify</ActionButton>
                 <ActionButton onClick={onApprove} variant="primary">Approve</ActionButton>
@@ -130,7 +130,7 @@ export default function CdssPanel({ phase, metrics, live, approvalState, dose, d
 // 한 행을 통째로 쓰므로 숫자가 행의 주인공이다. 좌측 라벨 / 우측 값, 값 우측 끝선은 서로 맞는다.
 function MetricRow({ label, value, unit, valueClass, small = false }) {
   return (
-    <div className="flex min-h-0 items-center justify-between gap-3 overflow-hidden border-t border-hairline px-3">
+    <div className="flex min-h-0 flex-col justify-center gap-0.5 border-t border-hairline px-3 py-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:py-0 xl:overflow-hidden">
       <span className="cdss-label truncate">{label}</span>
       <span className="flex items-baseline gap-1.5">
         <span className={`${small ? "cdss-row-value-sm" : "cdss-row-value"} ${valueClass}`}>{value}</span>
@@ -146,7 +146,7 @@ function DynamicBlock({ phase }) {
 
   if (narrative) {
     return (
-      <div className="min-h-0 overflow-hidden border-t border-hairline px-3 pt-1.5">
+      <div className="border-t border-hairline px-3 py-1.5 xl:min-h-0 xl:overflow-hidden xl:pt-1.5">
         <div className="cdss-label">Recommendation</div>
         <div className="cdss-body">
           {phase === "idle" ? "Continue monitoring; no opioid bolus indicated now" : "Response confirmed; continue current plan"}
@@ -158,10 +158,11 @@ function DynamicBlock({ phase }) {
   const cells = signalChangeFor(phase);
 
   return (
-    <div className="grid min-h-0 grid-rows-2 overflow-hidden border-t border-hairline">
-      <div className="flex min-h-0 items-center justify-between gap-3 overflow-hidden px-3">
+    <div className="grid border-t border-hairline xl:min-h-0 xl:grid-rows-2 xl:overflow-hidden">
+      {/* 좁은 폭에서는 라벨 아래로 chip을 내린다 — 한 행에 붙이면 아래 행을 침범한다 */}
+      <div className="flex min-h-0 flex-col justify-center gap-1 px-3 py-1.5 xl:flex-row xl:items-center xl:justify-between xl:gap-3 xl:overflow-hidden xl:py-0">
         <span className="cdss-label shrink-0">Signal change</span>
-        <div className="flex flex-wrap justify-end gap-1">
+        <div className="flex flex-wrap gap-1 xl:justify-end">
           {cells.map((c) => (
             <span key={c.label} className="signal-chip">
               <span className="font-semibold">{c.label}</span>
@@ -171,7 +172,7 @@ function DynamicBlock({ phase }) {
           ))}
         </div>
       </div>
-      <div className="flex min-h-0 items-center justify-between gap-3 overflow-hidden border-t border-hairline px-3">
+      <div className="flex min-h-0 flex-col justify-center gap-0.5 border-t border-hairline px-3 py-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:py-0 xl:overflow-hidden">
         <span className="cdss-label shrink-0">Next action</span>
         <span className="cdss-next-action truncate">{NEXT_ACTION[phase]}</span>
       </div>

@@ -7,7 +7,7 @@ import { HORIZON_MIN, THRESHOLD, formatTimeToThresholdShort } from "../data/phas
 // 모니터 패널 225px = 라벨 28 + 바 52 + 파형 본체 (PRD 5.1 예산). 파형은 추세 그래프 본체를 넘지 않는다.
 export default function MonitorPanel({ phase, metrics, live }) {
   return (
-    <section className="panel flex h-full min-h-0 w-full flex-col">
+    <section className="panel flex w-full flex-col xl:h-full xl:min-h-0">
       <div className="section-head shrink-0">
         <HeartPulse className="h-3.5 w-3.5" />
         Patient signal monitoring
@@ -42,7 +42,7 @@ function MonitorMetric({ label, value, wide = false, alert = false }) {
   return (
     <div className={`flex min-h-[52px] min-w-0 flex-col justify-center border-r border-monitor-grid px-3 last:border-r-0 ${wide ? "bar-wide" : ""}`}>
       <div className="truncate text-[12px] font-semibold uppercase tracking-[0.06em] text-monitor-ink-dim">{label}</div>
-      <div className={`truncate tabular-nums ${wide ? "text-sm font-semibold" : "text-lg font-bold tracking-[-0.02em]"} ${alert ? "text-monitor-alert" : "text-monitor-ink"}`}>
+      <div className={`tabular-nums leading-tight ${wide ? "text-sm font-semibold" : "text-lg font-bold tracking-[-0.02em]"} ${alert ? "text-monitor-alert" : "text-monitor-ink"}`}>
         {value}
         {alert && (
           <span className="ml-1 text-sm" role="img" aria-label="Above threshold">▲</span>

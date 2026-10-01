@@ -147,13 +147,13 @@ export default function TrendChart({ trend, metrics, live }) {
   const ariaLabel = `Pain Score(CPI) trend, past ${PAST_MIN} min and ${HORIZON_MIN} min forecast. Current ${metrics.painScore.toFixed(1)} / ${SCALE_MAX}, predicted ${shownPredicted.toFixed(1)} in ${HORIZON_MIN} min.`;
 
   return (
-    <section className="panel flex h-full min-h-0 w-full flex-col">
+    <section className="panel flex w-full flex-col xl:h-full xl:min-h-0">
       <div className="section-head">
         <LineChart className="h-3.5 w-3.5" />
         Pain Score(CPI) trend &amp; forecast
       </div>
 
-      <div ref={wrapRef} className="min-h-0 w-full flex-1 overflow-hidden px-3">
+      <div ref={wrapRef} className="min-h-[200px] w-full flex-1 px-3 sm:min-h-[240px] xl:min-h-0 xl:overflow-hidden">
         {width > 0 && (
           <svg width={width} height={H} role="img" aria-label={ariaLabel} className="block">
             <defs>
@@ -171,7 +171,7 @@ export default function TrendChart({ trend, metrics, live }) {
               </g>
             ))}
 
-            {X_TICKS.filter((t) => plotW >= 420 || t === -PAST_MIN || t === 0 || t === HORIZON_MIN).map((t) => (
+            {X_TICKS.filter((t) => (plotW >= 420 ? true : t === -PAST_MIN || t === 0)).map((t) => (
               <g key={`x${t}`}>
                 {t !== 0 && <line x1={x(t)} x2={x(t)} y1={M.top} y2={M.top + PLOT_H} className="stroke-chart-grid" strokeWidth="1" />}
                 <text

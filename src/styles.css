@@ -215,7 +215,7 @@ button {
     font-size: 30px;
     font-weight: 700;
     letter-spacing: -0.02em;
-    line-height: 1;
+    line-height: 1.08;
     font-variant-numeric: tabular-nums;
   }
 
@@ -253,7 +253,12 @@ button {
     font-size: 14px;
     font-weight: 600;
     color: var(--text-primary);
-    text-align: right;
+  }
+
+  @media (min-width: 1280px) {
+    .cdss-next-action {
+      text-align: right;
+    }
   }
 
   .cdss-fields {
@@ -296,7 +301,7 @@ button {
     font-size: clamp(20px, 26cqw, 52px);
     font-weight: 800;
     letter-spacing: -0.03em;
-    line-height: 1;
+    line-height: 1.1;
     font-variant-numeric: tabular-nums;
   }
 
@@ -351,7 +356,7 @@ button {
     font-size: clamp(30px, 11cqw, 60px);
     font-weight: 800;
     letter-spacing: -0.03em;
-    line-height: 1;
+    line-height: 1.08;
     font-variant-numeric: tabular-nums;
   }
 
@@ -427,7 +432,7 @@ button {
     font-size: clamp(34px, 9.6cqw, 78px);
     font-weight: 800;
     letter-spacing: -0.03em;
-    line-height: 1;
+    line-height: 1.08;
     font-variant-numeric: tabular-nums;
   }
 
@@ -436,7 +441,7 @@ button {
     font-size: clamp(23px, 6.3cqw, 51px);
     font-weight: 700;
     letter-spacing: -0.03em;
-    line-height: 1;
+    line-height: 1.08;
     font-variant-numeric: tabular-nums;
   }
 
