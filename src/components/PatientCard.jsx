@@ -1,12 +1,11 @@
 import React from "react";
-import { ArrowRight } from "lucide-react";
-import StatusBadge from "./StatusBadge.jsx";
-import { bedLabel, patientIdLabel } from "../data/patients.js";
+import { STATUS_CLASS, STATUS_ICON } from "./status.js";
+import { bedLabel, patientIdLabel, profileLabel } from "../data/patients.js";
 import { HORIZON_MIN, SCALE_MAX, THRESHOLD } from "../data/phases.js";
 
-// 현재값과 예측값을 같은 크기로 대등하게 놓는다. 정렬 기준이 예측값이므로
-// 그 값이 눈에 들어와야 "왜 이 순서인지"가 카드 안에서 설명된다.
-// 타이포와 막대는 컨테이너 폭(cqw)에 연동되어 카드가 커지면 함께 커진다.
+// 현재값과 예측값을 한 줄 막대에 겹쳐 담으면 읽히지 않는다. 두 줄로 나눠
+// 같은 트랙 위에 놓으면 길이 차이로 바로 비교된다.
+// 타이포·막대·chip은 컨테이너 폭(cqw)에 연동되어 카드가 커지면 함께 커진다.
 // 색 판정은 목표값 4.0 하나로만 갈라진다 (PRD 5.4-1).
 export default function PatientCard({ patient, painScore, predicted, status, rank, onOpen }) {
   const breach = predicted >= THRESHOLD;
@@ -31,58 +30,77 @@ export default function PatientCard({ patient, painScore, predicted, status, ran
         <span className="ml-auto text-[11px] font-medium tabular-nums text-white/65">{patientIdLabel(patient)}</span>
       </div>
 
-      <div className={`flex flex-1 flex-col gap-3 px-4 py-3 ${breach ? "bg-status-critical-tint" : ""}`}>
-        <div className="flex items-end justify-between gap-2">
-          <Reading label="Now" value={painScore} breach={painScore >= THRESHOLD} />
-          <ArrowRight className="card-arrow mb-2 shrink-0" aria-hidden="true" />
-          <Reading label={`+${HORIZON_MIN} min`} value={predicted} breach={breach} align="right" />
+      <div className={`flex flex-1 flex-col justify-between gap-3 px-4 py-3 ${breach ? "bg-status-critical-tint" : ""}`}>
+        <div className="card-context truncate">{`${profileLabel(patient)} · ${patient.procedure}`}</div>
+
+        <div className="flex items-end justify-between gap-3">
+          <span className="flex items-baseline gap-1.5">
+            <span className={`card-value ${painScore >= THRESHOLD ? "text-status-critical" : "text-text-primary"}`}>
+              {painScore.toFixed(1)}
+            </span>
+            <span className="card-unit">{`/ ${SCALE_MAX}`}</span>
+          </span>
+          <CardStatusChip status={status} />
         </div>
 
-        <ForecastBar painScore={painScore} predicted={predicted} />
+        <DualBar painScore={painScore} predicted={predicted} />
 
-        <div className="mt-auto flex justify-end">
-          <StatusBadge status={status} />
+        <div className="flex items-baseline justify-between gap-3 border-t border-hairline pt-2">
+          <span className="card-label">{`Predicted · ${HORIZON_MIN} min`}</span>
+          <span className={`card-forecast ${breach ? "text-status-critical" : "text-text-primary"}`}>{predicted.toFixed(1)}</span>
         </div>
       </div>
     </Tag>
   );
 }
 
-function Reading({ label, value, breach, align = "left" }) {
+// 카드 안에서는 상태를 더 크게 보여준다. 색 규칙은 공통이다 (ACTION REQUIRED만 색).
+function CardStatusChip({ status }) {
+  const tone = STATUS_CLASS[status.color];
+  const Icon = STATUS_ICON[status.label];
   return (
-    <div className={`min-w-0 ${align === "right" ? "text-right" : ""}`}>
-      <div className="card-label">{label}</div>
-      <div className={`card-value ${breach ? "text-status-critical" : "text-text-primary"}`}>{value.toFixed(1)}</div>
-      <div className="card-unit">{`/ ${SCALE_MAX}`}</div>
+    <span className={`card-chip shrink-0 ${tone.tint} ${tone.text}`}>
+      <Icon className="card-chip-icon" />
+      {status.label}
+    </span>
+  );
+}
+
+// 두 막대는 같은 트랙과 같은 축을 공유한다. 눈금과 목표선은 아래에 한 번만 그린다.
+// 핸들이나 원형 마커는 얹지 않는다 — 그 조합이 슬라이더로 읽히게 만든다.
+function DualBar({ painScore, predicted }) {
+  const pos = (v) => `${(v / SCALE_MAX) * 100}%`;
+
+  return (
+    <div aria-hidden="true">
+      {/* 목표선은 각 막대에서 위아래로 3px씩 튀어나와 두 줄을 가로지르는 한 선으로 읽힌다 */}
+      <div className="flex flex-col gap-[clamp(5px,1.8cqh,12px)]">
+        <BarRow label="Now" value={painScore} />
+        <BarRow label={`+${HORIZON_MIN}m`} value={predicted} />
+      </div>
+
+      <div className="mt-1.5 flex items-center gap-2">
+        <span className="bar-row-label shrink-0" aria-hidden="true" />
+        <div className="relative h-3 flex-1">
+          <span className="card-scale absolute left-0">0</span>
+          <span className="card-scale absolute -translate-x-1/2 font-semibold text-text-label" style={{ left: pos(THRESHOLD) }}>
+            {THRESHOLD.toFixed(1)}
+          </span>
+          <span className="card-scale absolute right-0">{SCALE_MAX}</span>
+        </div>
+      </div>
     </div>
   );
 }
 
-// 0부터 현재값까지는 실선, 현재값에서 예측값까지는 빗금 연장 구간.
-// 핸들이나 원형 마커를 얹지 않는다 — 빈 트랙 + 채움 + 핸들 조합이 슬라이더로 읽히게 만든다.
-function ForecastBar({ painScore, predicted }) {
-  const pos = (v) => (v / SCALE_MAX) * 100;
-  const breach = predicted >= THRESHOLD;
-  const from = Math.min(pos(painScore), pos(predicted));
-  const to = Math.max(pos(painScore), pos(predicted));
-
+function BarRow({ label, value }) {
+  const breach = value >= THRESHOLD;
   return (
-    <div aria-hidden="true">
-      <div className="card-bar">
-        <div className={`bar-fill ${painScore >= THRESHOLD ? "bar-fill-breach" : ""}`} style={{ left: 0, width: `${pos(painScore)}%` }} />
-        <div
-          className={`bar-extend ${breach ? "bar-extend-breach" : ""}`}
-          style={{ left: `${from}%`, width: `${Math.max(to - from, 0.8)}%` }}
-        />
-        <div className="bar-target" style={{ left: `${pos(THRESHOLD)}%` }} />
-      </div>
-
-      <div className="relative mt-2 h-3">
-        <span className="card-scale absolute left-0">0</span>
-        <span className="card-scale absolute -translate-x-1/2 font-semibold text-text-label" style={{ left: `${pos(THRESHOLD)}%` }}>
-          {THRESHOLD.toFixed(1)}
-        </span>
-        <span className="card-scale absolute right-0">{SCALE_MAX}</span>
+    <div className="flex items-center gap-2">
+      <span className="bar-row-label shrink-0">{label}</span>
+      <div className="card-bar flex-1">
+        <div className={`bar-fill ${breach ? "bar-fill-breach" : ""}`} style={{ width: `${(value / SCALE_MAX) * 100}%` }} />
+        <div className="bar-target" style={{ left: `${(THRESHOLD / SCALE_MAX) * 100}%` }} />
       </div>
     </div>
   );

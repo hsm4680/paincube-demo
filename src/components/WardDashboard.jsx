@@ -7,8 +7,8 @@ const GAP = 16; // px, 카드 간격
 // 카드 하나가 잘림·줄바꿈 없이 들어가는 최소 폭. 열 수는 뷰포트가 아니라 이 값과
 // 컨테이너 실제 폭으로 정한다. 내부 요소가 잘리면 그 열 수가 틀린 것이다.
 const MIN_CARD_W = 268;
-const MIN_CARD_H = 208; // px, 카드가 이보다 낮아지지 않는다
-const CARD_H_SM = 196; // px, 3행 이상일 때는 고정 높이 + 페이지 스크롤
+const MIN_CARD_H = 248; // px, 카드가 이보다 낮아지지 않는다
+const CARD_H_SM = 248; // px, 3행 이상일 때는 고정 높이 + 페이지 스크롤
 
 // 컨테이너 폭을 직접 재서 열 수를 정한다 (미디어 쿼리가 아니라 컨테이너 기준)
 function useGridColumns(ref) {
