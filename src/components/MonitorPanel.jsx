@@ -41,7 +41,7 @@ function MonitorBar({ metrics, live }) {
 function MonitorMetric({ label, value, wide = false, alert = false }) {
   return (
     <div className={`flex min-h-[52px] min-w-0 flex-col justify-center border-r border-monitor-grid px-3 last:border-r-0 ${wide ? "bar-wide" : ""}`}>
-      <div className="truncate text-[10px] font-semibold uppercase tracking-[0.08em] text-monitor-ink-dim">{label}</div>
+      <div className="truncate text-[12px] font-semibold uppercase tracking-[0.06em] text-monitor-ink-dim">{label}</div>
       <div className={`truncate tabular-nums ${wide ? "text-sm font-semibold" : "text-lg font-bold tracking-[-0.02em]"} ${alert ? "text-monitor-alert" : "text-monitor-ink"}`}>
         {value}
         {alert && (

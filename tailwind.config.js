@@ -7,6 +7,7 @@ const tokens = [
   "brand-navy",
   "brand-panel",
   "brand-light",
+  "brand-light-deep",
   "page-bg",
   "card-surface",
   "hairline",

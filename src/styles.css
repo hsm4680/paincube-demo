@@ -8,6 +8,9 @@
   --brand-navy: #1b1b52;
   --brand-panel: #102c5e;
   --brand-light: #77a0d5;
+  /* 예측 바(그래픽 객체) 전용 — --brand-light는 트랙 대비 2.36:1로 3:1에 미달한다.
+     CI 색상환 안에서 hue·채도는 유지하고 명도만 낮춰 3.22:1을 확보했다. */
+  --brand-light-deep: #5487ca;
   --page-bg: #ebf0f6;
   --card-surface: #ffffff;
   --hairline: #d7e0ec;
@@ -112,7 +115,7 @@ button {
     padding: 0 12px;
     background: var(--brand-navy);
     color: #fff;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -144,7 +147,7 @@ button {
     background: var(--page-bg);
     color: var(--text-label);
     border-bottom: 1px solid var(--hairline);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -438,27 +441,27 @@ button {
   }
 
   .card-unit {
-    font-size: clamp(12px, 2.6cqw, 20px);
+    font-size: clamp(13px, 2.6cqw, 20px);
     font-weight: 600;
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
   }
 
   .card-label {
-    font-size: clamp(10px, 1.9cqw, 14px);
+    font-size: clamp(12px, 2cqw, 15px);
     font-weight: 600;
     letter-spacing: 0.04em;
     color: var(--text-label);
   }
 
   .card-context {
-    font-size: clamp(11px, 2.1cqw, 15px);
+    font-size: clamp(13px, 2.2cqw, 16px);
     font-weight: 500;
     color: var(--text-label);
   }
 
   .card-scale {
-    font-size: clamp(9px, 1.7cqw, 13px);
+    font-size: clamp(12px, 1.9cqw, 15px);
     font-variant-numeric: tabular-nums;
     color: var(--text-muted);
   }
@@ -469,8 +472,8 @@ button {
     align-items: center;
     gap: 6px;
     border-radius: var(--radius-control);
-    padding: clamp(3px, 0.8cqw, 7px) clamp(7px, 1.8cqw, 13px);
-    font-size: clamp(10px, 1.9cqw, 14px);
+    padding: clamp(4px, 0.9cqw, 8px) clamp(8px, 1.8cqw, 13px);
+    font-size: clamp(12px, 2cqw, 15px);
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -484,8 +487,8 @@ button {
 
   /* 이중 막대 — 두 값을 같은 트랙 위에 한 줄씩. 길이 차이로 비교된다. */
   .bar-row-label {
-    width: clamp(30px, 7.2cqw, 56px);
-    font-size: clamp(9px, 1.7cqw, 13px);
+    width: clamp(38px, 8cqw, 60px);
+    font-size: clamp(12px, 1.9cqw, 15px);
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -510,15 +513,9 @@ button {
     background: var(--status-critical);
   }
 
-  /* 목표선 — 두 막대를 모두 가로지른다 */
-  .bar-target {
-    position: absolute;
-    top: -3px;
-    bottom: -3px;
-    width: 2px;
-    transform: translateX(-50%);
-    background: var(--text-primary);
-    z-index: 1;
+  /* 예측 바 — 트랙 대비 3.22:1 */
+  .bar-fill-forecast {
+    background: var(--brand-light-deep);
   }
 
   /* 눈금자 축 — hairline보다 살짝 진한 중성색. 채움을 쓰지 않는다 (Ref_05). */
@@ -551,7 +548,7 @@ button {
   }
 
   .t-value {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     line-height: 1.3;
     color: var(--text-primary);
@@ -559,14 +556,14 @@ button {
   }
 
   .t-label {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 600;
     letter-spacing: 0;
     color: var(--text-label);
   }
 
   .t-caption {
-    font-size: 9px;
+    font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.02em;
     color: var(--text-muted);
@@ -574,7 +571,7 @@ button {
 
   /* 단위는 값보다 확실히 작고 흐리다 */
   .t-unit {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
@@ -586,8 +583,8 @@ button {
     align-items: center;
     gap: 5px;
     border-radius: var(--radius-control);
-    padding: 2px 6px;
-    font-size: 10px;
+    padding: 3px 7px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;

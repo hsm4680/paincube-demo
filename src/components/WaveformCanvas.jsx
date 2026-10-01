@@ -192,7 +192,7 @@ export default function WaveformCanvas({ phase }) {
       ctx.stroke();
 
       ctx.fillStyle = colors.label;
-      ctx.font = "600 10px ui-sans-serif, system-ui, sans-serif";
+      ctx.font = "600 12px ui-sans-serif, system-ui, sans-serif";
       ctx.fillText(`${trace.label}_${trace.unit}`, 10, top + 12);
 
       const buffer = buffers.get(trace.key) || [];

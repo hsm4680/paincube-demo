@@ -49,7 +49,9 @@ export const PAIN_JITTER = 0.3;
 
 export const bedLabel = (p) => `ICU Bed ${p.bed}`;
 export const patientIdLabel = (p) => `#${p.id}`;
-export const profileLabel = (p) => `${p.sex} / ${p.age}`;
+// 표시 레이어 매핑 — 데이터의 sex 값('M'/'F')은 그대로 둔다
+export const formatSex = (sex) => (sex === "M" ? "Male" : sex === "F" ? "Female" : sex);
+export const profileLabel = (p) => `${formatSex(p.sex)} \u00b7 Age ${p.age}`;
 
 // 환자 헤더 2번째 줄 — "CABG · POD 0 · Intubated, RASS −4"
 const rassLabel = (rass) => `RASS ${rass < 0 ? "\u2212" : ""}${Math.abs(rass)}`;

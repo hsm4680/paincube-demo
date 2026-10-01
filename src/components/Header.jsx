@@ -33,14 +33,14 @@ export default function Header({ patient, status, onStart, onReset, onBack, demo
               <div className="truncate text-[17px] font-semibold tracking-[-0.01em] text-white">
                 {`${patientIdLabel(patient)} · ${profileLabel(patient)} · ${bedLabel(patient)}`}
               </div>
-              <div className="mt-0.5 truncate text-[12px] text-white/70">{contextLine(patient)}</div>
+              <div className="mt-0.5 truncate text-[13px] text-white/70">{contextLine(patient)}</div>
             </div>
             {patient.selfReport === false && <NrsBadge />}
           </div>
         ) : (
           <div className="min-w-0">
             <h1 className="truncate text-[17px] font-semibold tracking-[-0.01em] text-white">{`${WARD.name} · ${WARD.beds} beds`}</h1>
-            <div className="mt-0.5 truncate text-[12px] text-white/70">{`Sorted by predicted Pain Score · ${HORIZON_MIN} min horizon`}</div>
+            <div className="mt-0.5 truncate text-[13px] text-white/70">{`Sorted by predicted Pain Score · ${HORIZON_MIN} min horizon`}</div>
           </div>
         )}
 

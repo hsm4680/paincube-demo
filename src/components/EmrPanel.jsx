@@ -35,7 +35,7 @@ export default function EmrPanel({ phase, metrics, dose }) {
     <section className="panel flex min-h-[124px] shrink-0 flex-col">
       <div className="section-head justify-between">
         <span>EMR context — inputs to prediction and safety check</span>
-        <span className="hidden text-[9px] font-medium normal-case tracking-[0.04em] text-white/55 lg:inline">
+        <span className="hidden text-[12px] font-medium normal-case tracking-[0.02em] text-white/60 lg:inline">
           HL7 FHIR R4 · Epic / Cerner compatible
         </span>
       </div>

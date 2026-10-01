@@ -165,7 +165,7 @@ export default function TrendChart({ trend, metrics, live }) {
             {Y_TICKS.map((v) => (
               <g key={`y${v}`}>
                 <line x1={M.left} x2={M.left + plotW} y1={y(v)} y2={y(v)} className="stroke-chart-grid" strokeWidth="1" />
-                <text x={M.left - 10} y={y(v)} dy="0.35em" textAnchor="end" className="fill-text-muted text-[11px] tabular-nums">
+                <text x={M.left - 10} y={y(v)} dy="0.35em" textAnchor="end" className="fill-text-muted text-[12px] tabular-nums">
                   {v}
                 </text>
               </g>
@@ -178,7 +178,7 @@ export default function TrendChart({ trend, metrics, live }) {
                   x={x(t)}
                   y={M.top + PLOT_H + 16}
                   textAnchor={t === -PAST_MIN ? "start" : t === HORIZON_MIN ? "end" : "middle"}
-                  className={`text-[11px] tabular-nums ${t === 0 ? "fill-text-primary font-semibold" : "fill-text-muted"}`}
+                  className={`text-[12px] tabular-nums ${t === 0 ? "fill-text-primary font-semibold" : "fill-text-muted"}`}
                 >
                   {t === 0 ? "Now" : `${t > 0 ? "+" : "−"}${Math.abs(t)} min`}
                 </text>

@@ -25,13 +25,13 @@ export default function PatientCard({ patient, painScore, predicted, status, ran
         className={`flex items-center gap-2 px-3 ${breach ? "bg-status-critical text-white" : "bg-brand-navy text-white"}`}
         style={{ minHeight: "var(--section-head-h)" }}
       >
-        <span className="text-[11px] font-bold tabular-nums text-white/60">{rank}</span>
-        <span className="text-[11px] font-semibold uppercase tracking-[0.08em]">{bedLabel(patient)}</span>
-        <span className="ml-auto text-[11px] font-medium tabular-nums text-white/65">{patientIdLabel(patient)}</span>
+        <span className="text-[12px] font-bold tabular-nums text-white/60">{rank}</span>
+        <span className="text-[13px] font-semibold uppercase tracking-[0.08em]">{bedLabel(patient)}</span>
+        <span className="ml-auto text-[12px] font-medium tabular-nums text-white/65">{patientIdLabel(patient)}</span>
       </div>
 
       <div className={`flex flex-1 flex-col justify-between gap-3 px-4 py-3 ${breach ? "bg-status-critical-tint" : ""}`}>
-        <div className="card-context truncate">{`${profileLabel(patient)} · ${patient.procedure}`}</div>
+        <div className="card-context line-clamp-2">{`${profileLabel(patient)} · ${patient.procedure}`}</div>
 
         <div className="flex items-end justify-between gap-3">
           <span className="flex items-baseline gap-1.5">
@@ -76,16 +76,14 @@ function DualBar({ painScore, predicted }) {
       {/* 목표선은 각 막대에서 위아래로 3px씩 튀어나와 두 줄을 가로지르는 한 선으로 읽힌다 */}
       <div className="flex flex-col gap-[clamp(5px,1.8cqh,12px)]">
         <BarRow label="Now" value={painScore} />
-        <BarRow label={`+${HORIZON_MIN}m`} value={predicted} />
+        <BarRow label={`+${HORIZON_MIN}m`} value={predicted} forecast />
       </div>
 
       <div className="mt-1.5 flex items-center gap-2">
         <span className="bar-row-label shrink-0" aria-hidden="true" />
-        <div className="relative h-3 flex-1">
+        {/* 4.0 눈금과 라벨은 두지 않는다 — 색이 그 역할을 한다 (PRD 4.2-1). 양 끝 스케일만 남긴다. */}
+        <div className="relative h-4 flex-1">
           <span className="card-scale absolute left-0">0</span>
-          <span className="card-scale absolute -translate-x-1/2 font-semibold text-text-label" style={{ left: pos(THRESHOLD) }}>
-            {THRESHOLD.toFixed(1)}
-          </span>
           <span className="card-scale absolute right-0">{SCALE_MAX}</span>
         </div>
       </div>
@@ -93,14 +91,16 @@ function DualBar({ painScore, predicted }) {
   );
 }
 
-function BarRow({ label, value }) {
+// NOW는 브랜드 네이비, +15M은 CI 하늘색. 단 임계를 넘는 예측은 critical로 남긴다 —
+// 와드 뷰에서 "이 환자가 임계를 넘는다"를 알리는 유일한 시각 신호다 (PRD 4.2-1).
+function BarRow({ label, value, forecast = false }) {
   const breach = value >= THRESHOLD;
+  const fillClass = forecast ? (breach ? "bar-fill-breach" : "bar-fill-forecast") : "";
   return (
     <div className="flex items-center gap-2">
       <span className="bar-row-label shrink-0">{label}</span>
       <div className="card-bar flex-1">
-        <div className={`bar-fill ${breach ? "bar-fill-breach" : ""}`} style={{ width: `${(value / SCALE_MAX) * 100}%` }} />
-        <div className="bar-target" style={{ left: `${(THRESHOLD / SCALE_MAX) * 100}%` }} />
+        <div className={`bar-fill ${fillClass}`} style={{ width: `${(value / SCALE_MAX) * 100}%` }} />
       </div>
     </div>
   );

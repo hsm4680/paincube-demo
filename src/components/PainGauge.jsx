@@ -6,6 +6,7 @@ import { BASELINE_WINDOW_H, HORIZON_MIN, SCALE_MAX, SEVERE, THRESHOLD } from "..
 // 각 게이지는 자기 값으로 독립 판정한다. 색은 임상 NRS 밴드를 따른다 (PRD 5.5-2):
 //   0–4 mild → stable / 4–7 moderate → caution / 7–10 severe → critical
 // 트랙은 세 밴드의 tint로 분할하고, 값 호와 숫자는 해당 밴드의 solid 색을 쓴다.
+// 4.0 tick은 두지 않는다 — 밴드 tint가 경계를 설명 없이 보여준다 (PRD 4.2-1).
 // 이 색은 "값의 밴드"를 나타내는 데이터 인코딩이고, 상태 배지의 색 규칙과는 별개 계층이다.
 // 판정은 jitter가 적용되지 않은 기준값으로 한다 — 경계에서 색이 깜빡이면 안 된다.
 const CX = 60;
@@ -69,8 +70,6 @@ export default function PainGauge({ metrics, live }) {
 // 색 판정은 기준값(base)으로 한다 — 표시값은 흔들려도 색은 깜빡이지 않는다
 function Dial({ value, base, label, divided = false }) {
   const band = bandOf(base);
-  const [tickInner, tickOuter] = [polar(THRESHOLD, R - 10), polar(THRESHOLD, R + 10)];
-
   return (
     <div className={`forecast-cell flex min-w-0 flex-col items-center justify-center gap-1.5 px-2 ${divided ? "rule-l" : ""}`}>
       <div className="forecast-label text-center">{label}</div>
@@ -82,8 +81,6 @@ function Dial({ value, base, label, divided = false }) {
           ))}
           {/* 값 호 — 값이 속한 밴드의 solid 색 */}
           <path d={arc(0, value)} fill="none" className={band.arc} strokeWidth="12" />
-          {/* 목표 4.0 눈금 */}
-          <line x1={tickInner[0]} y1={tickInner[1]} x2={tickOuter[0]} y2={tickOuter[1]} className="stroke-text-primary" strokeWidth="2" />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
           <span className={`forecast-value ${band.text}`}>{value.toFixed(1)}</span>
