@@ -41,7 +41,7 @@ const EMR_BASE = {
   renal: "eGFR 74"
 };
 
-// timeToThreshold: 분 단위, 예측상 임계 도달이 없으면 null → "No breach predicted"
+// timeToThreshold: 분 단위, 예측 지평 안에 임계 도달이 없으면 null → "None in 15 min"
 export const PHASES = {
   idle: {
     status: STATUS.STABLE,
@@ -165,9 +165,17 @@ export const lastAnalgesicFor = (phase, dose, current) => {
   return current;
 };
 
+// "breach"는 미국 의료 맥락에서 HIPAA 데이터 유출을 먼저 연상시키고, 기간이 없어
+// 모델의 예측 지평을 넘어선 주장으로 읽힌다. 지평을 명시한 표현을 쓴다.
 export const formatTimeToThreshold = (minutes) =>
-  minutes == null ? "No breach predicted" : `${minutes} min`;
+  minutes == null ? `None in ${HORIZON_MIN} min` : `${minutes} min`;
+
+// Pain Forecast 게이지의 Time to Threshold 칸 (주 값 / 보조 줄)
+export const timeToThresholdParts = (minutes) =>
+  minutes == null
+    ? { primary: `None in ${HORIZON_MIN} min`, secondary: "predicted", isText: true }
+    : { primary: `${minutes}`, secondary: "min", isText: false };
 
 // 모니터 바 전용 축약 표기 (PRD 3.3). 상단 KPI에서는 위의 전체 표기를 쓴다.
 export const formatTimeToThresholdShort = (minutes) =>
-  minutes == null ? "NO BREACH" : `${minutes} min`;
+  minutes == null ? `NONE · ${HORIZON_MIN} MIN` : `${minutes} min`;

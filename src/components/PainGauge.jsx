@@ -1,5 +1,5 @@
 import React from "react";
-import { BASELINE_WINDOW_H, HORIZON_MIN, SCALE_MAX, SEVERE, THRESHOLD } from "../data/phases.js";
+import { BASELINE_WINDOW_H, HORIZON_MIN, SCALE_MAX, SEVERE, THRESHOLD, timeToThresholdParts } from "../data/phases.js";
 
 // Pain Forecast 카드 — 현재값·예측값을 각각 독립된 원형 게이지로, 세 번째 칸에 Time to Threshold.
 // 하나의 호에 두 값을 겹쳐 그리던 방식(실선 + 점선 확장)은 버렸다. 두 값은 대등하다.
@@ -32,7 +32,7 @@ const arc = (from, to) => {
 };
 
 export default function PainGauge({ metrics, live }) {
-  const noBreach = metrics.timeToThreshold == null;
+  const ttt = timeToThresholdParts(metrics.timeToThreshold);
 
   return (
     <section className="panel flex h-full w-full min-h-0 flex-col">
@@ -43,11 +43,11 @@ export default function PainGauge({ metrics, live }) {
           <Dial value={live ? live.painScore : metrics.painScore} base={metrics.painScore} label="Current Pain Score" />
           <Dial value={live ? live.predicted : metrics.predicted} base={metrics.predicted} label={`Predicted · ${HORIZON_MIN} min`} divided />
           <Figure
-            primary={noBreach ? "No breach" : `${metrics.timeToThreshold}`}
-            secondary={noBreach ? "predicted" : "min"}
+            primary={ttt.primary}
+            secondary={ttt.secondary}
             label="Time to Threshold"
-            toneClass={noBreach ? "text-text-primary" : bandOf(metrics.predicted).text}
-            text={noBreach}
+            toneClass={ttt.isText ? "text-text-primary" : bandOf(metrics.predicted).text}
+            text={ttt.isText}
           />
         </div>
 

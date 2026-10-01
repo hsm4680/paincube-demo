@@ -63,7 +63,7 @@ v1의 `RISK 12%` / `Pain probability` / `Low probability of severe pain, 12%` �
 **전부 삭제한다.** 보정된 확률은 검증 데이터로 뒷받침해야 방어 가능하므로,
 같은 자리에 **Time to Threshold**를 넣는다.
 
-- 안정 상태 표기: `No breach predicted`
+- 안정 상태 표기: `None in 15 min`
 
 ### 2.5 상태어 (Status word)
 
@@ -168,8 +168,8 @@ v1은 HR에 형광 초록 `#69F24C`를 썼다. 네이비 배경에서 눈이 아
 - 적용 대상: 모니터 상단 바의 `PRED_15M` 한 칸만. 나머지 칸과 Vitals는 적용하지 않는다.
 
 **모니터 바의 Time to Threshold 축약 표기**
-좁은 칸에서 `No breach predicted`는 두 줄이 되어 바 높이를 밀어낸다.
-모니터 바에서만 **`NO BREACH`**로 축약한다. 상단 KPI 3칸에서는 전체 표기를 쓴다.
+좁은 칸에서 `None in 15 min`는 두 줄이 되어 바 높이를 밀어낸다.
+모니터 바에서만 **`NONE · 15 MIN`**으로 축약한다. 상단 KPI 3칸에서는 전체 표기를 쓴다.
 
 ### 3.4 추세 그래프
 
@@ -442,8 +442,11 @@ v2에서는 화면 전환으로 캔버스가 재마운트되므로,
 **3칸 — Time to Threshold**
 
 - **시각화하지 않는다.** 수치만 게이지 숫자와 비슷한 비중으로 둔다.
-- 안정 시에는 `No breach`를 크게, `predicted`를 작게 두 줄로 둔다.
+- 안정 시에는 `None in 15 min`을 크게, `predicted`를 작게 두 줄로 둔다.
   (문구는 숫자보다 한 단계 작은 크기를 쓴다)
+- 표기는 **`None in 15 min`**이다. `No breach`는 쓰지 않는다 — 미국 의료 맥락에서
+  `breach`가 HIPAA 데이터 유출을 먼저 연상시키고, 기간이 없어 예측 지평을 넘어선 주장으로 읽힌다.
+  모니터 상단 바처럼 폭이 좁은 곳은 `NONE · 15 MIN`으로 축약한다.
 
 **하단 공통**
 
@@ -595,7 +598,7 @@ AI가 권고한 값과 임상의가 실제로 결정한 값이 화면에 나란�
 - 값은 행의 주인공이다(30px). 단위 접미사(`/ 10`)는 값의 절반 크기에 `--text-muted`.
 - **CURRENT·PREDICTED에는 게이지와 같은 밴드 색**을 쓴다(5.5-2절). 같은 값에 다른 색이 나오면 안 된다.
 - **TIME TO THRESHOLD는 밴드 색 대상이 아니다.** 시간은 Pain Score 스케일이 아니므로
-  `No breach predicted`도 `12 min`도 `--text-primary`를 쓴다.
+  `None in 15 min`도 `12 min`도 `--text-primary`를 쓴다.
 - 색 판정은 jitter 미적용 기준값으로 한다.
 
 **E 동적 블록**
@@ -755,11 +758,11 @@ CABG · POD 0 · Intubated, RASS −4        ○ NRS UNAVAILABLE
 
 | 단계 | 상태어 | Pain Score | Pred +15m | Time to Threshold | AI Status |
 |---|---|---|---|---|---|
-| `idle` | STABLE | 1.4 | 1.5 | `No breach predicted` | Baseline locked |
+| `idle` | STABLE | 1.4 | 1.5 | `None in 15 min` | Baseline locked |
 | `warning` | RISING | 1.8 | 5.4 | `12 min` | Rising sympathetic response |
 | `recommendation` | ACTION REQUIRED | 2.6 | 6.8 | `8 min` | Intervention recommended |
-| `administering` | TREATING | 3.1 | 3.6 | `No breach predicted` | Medication response tracking |
-| `recovered` | STABILIZED | 1.7 | 1.6 | `No breach predicted` | Pain response stabilized |
+| `administering` | TREATING | 3.1 | 3.6 | `None in 15 min` | Medication response tracking |
+| `recovered` | STABILIZED | 1.7 | 1.6 | `None in 15 min` | Pain response stabilized |
 
 **Vitals**
 

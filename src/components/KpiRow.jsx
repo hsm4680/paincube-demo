@@ -1,5 +1,5 @@
 import React from "react";
-import { HORIZON_MIN, SCALE_MAX, THRESHOLD, formatTimeToThreshold } from "../data/phases.js";
+import { HORIZON_MIN, SCALE_MAX, THRESHOLD, timeToThresholdParts } from "../data/phases.js";
 import { STATUS_CLASS } from "./status.js";
 
 // 상단 KPI 3칸 (PRD 5.2) — 카드 3개가 아니라 한 줄에 세로 구분선으로 나눈다.
@@ -18,8 +18,8 @@ export default function KpiRow({ metrics }) {
       />
       <Kpi
         label="Time to Threshold"
-        value={metrics.timeToThreshold == null ? "No breach" : `${metrics.timeToThreshold}`}
-        unit={metrics.timeToThreshold == null ? "predicted" : "min"}
+        value={timeToThresholdParts(metrics.timeToThreshold).primary}
+        unit={timeToThresholdParts(metrics.timeToThreshold).secondary}
         valueClass={metrics.timeToThreshold == null ? undefined : forecast.text}
         small={metrics.timeToThreshold == null}
         divided
